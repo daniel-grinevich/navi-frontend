@@ -27,8 +27,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <nav className="h-16 w-full bg-black">
+          <h1>LOGO</h1>
+        </nav>
+          {children}
+        <footer className="">
+          <p>© 2024 Footer</p>
+        </footer>
       </body>
+      
     </html>
   );
 }
