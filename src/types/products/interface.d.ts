@@ -30,3 +30,17 @@ interface Temperature {
     id: number; // Unique identifier
     name: string;
 }
+
+export interface TempProduct {
+
+    id:number,
+    name:string,
+    description:string,
+    price:number,
+    region:string,
+    weight:number,
+    flavor_profile:[],
+    grind_option:[],
+    roast_level:number,
+    image_url: string,
+}

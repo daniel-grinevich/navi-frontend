@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Cart } from "@/components/cart";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -29,6 +30,7 @@ export default function RootLayout({
       >
         <nav className="h-16 w-full bg-black">
           <h1>LOGO</h1>
+          <Cart />
         </nav>
           {children}
         <footer className="">
