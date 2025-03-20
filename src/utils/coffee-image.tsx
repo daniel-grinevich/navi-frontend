@@ -19,8 +19,8 @@ export default function CoffeeImage(props: {
       src={`/api/productimage/${props.imageId}`} 
       className={props.className}
       alt={props.name}
-      width={64}
-      height={64}
+      width={32}
+      height={32}
     />
   );
 }

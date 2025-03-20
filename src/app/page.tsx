@@ -1,28 +1,15 @@
-import { Products } from "@/components/products";
+import { CategoriesContainer } from "@/components/category_container";
 import { Suspense } from "react";
 
-
-export default async function Home() {
-
+export default function Home() {
   return (
     <div className="mx-3 relative">
-      <h1>Menu Scaffolding</h1>
+      <h1 className="text-3xl">Pick a category!</h1>
       <div>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Products />
+        <Suspense fallback={<div>Loading categories...</div>}>
+          <CategoriesContainer />
         </Suspense>
       </div>
     </div>
   );
 }
-
-
-// <ul>
-//         {menuItems.map((item) => (
-//           <li key={item.id}>
-//             <h2>{item.name}</h2>
-//             <p>{item.description}</p>
-//             <p>Price: ${item.price.toFixed(2)}</p>
-//           </li>
-//         ))}
-//       </ul>

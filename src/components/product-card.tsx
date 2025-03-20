@@ -7,15 +7,17 @@ export async function ProductCard({ product }: { product: TempProduct }) {
     const imageId: string | undefined = productImageUrl?.[1];
 
     return (
-        <div className="p-4 border border-white h-48">
+        <div className="p-4 border border-black h-48 flex flex-col items-center">
             <CoffeeImage
                 key={product.id}
                 imageId={imageId}
                 name={product.name}
-                className="w-8 h-8"
+                className="w-32 h-32"
             />
-            <h1>{product.name}</h1>
-            <h2>${product.price}</h2>
+            <div>
+                <h3 className="text-xl font-bold">{product.name}</h3>
+                <p className="text-sm">${product.price}</p>
+            </div>
         </div>
     );
 }
