@@ -1,4 +1,12 @@
 {
+  "[typescript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[typescriptreact]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
   "files.watcherExclude": {
     "**/routeTree.gen.ts": true
   },
