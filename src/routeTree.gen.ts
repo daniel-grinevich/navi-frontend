@@ -11,17 +11,10 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as TodoImport } from './routes/todo'
 import { Route as MenuImport } from './routes/menu'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
-
-const TodoRoute = TodoImport.update({
-  id: '/todo',
-  path: '/todo',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const MenuRoute = MenuImport.update({
   id: '/menu',
@@ -53,13 +46,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MenuImport
       parentRoute: typeof rootRoute
     }
-    '/todo': {
-      id: '/todo'
-      path: '/todo'
-      fullPath: '/todo'
-      preLoaderRoute: typeof TodoImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -68,41 +54,36 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/menu': typeof MenuRoute
-  '/todo': typeof TodoRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/menu': typeof MenuRoute
-  '/todo': typeof TodoRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/menu': typeof MenuRoute
-  '/todo': typeof TodoRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/menu' | '/todo'
+  fullPaths: '/' | '/menu'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/menu' | '/todo'
-  id: '__root__' | '/' | '/menu' | '/todo'
+  to: '/' | '/menu'
+  id: '__root__' | '/' | '/menu'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MenuRoute: typeof MenuRoute
-  TodoRoute: typeof TodoRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MenuRoute: MenuRoute,
-  TodoRoute: TodoRoute,
 }
 
 export const routeTree = rootRoute
@@ -116,8 +97,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/menu",
-        "/todo"
+        "/menu"
       ]
     },
     "/": {
@@ -125,9 +105,6 @@ export const routeTree = rootRoute
     },
     "/menu": {
       "filePath": "menu.tsx"
-    },
-    "/todo": {
-      "filePath": "todo.tsx"
     }
   }
 }

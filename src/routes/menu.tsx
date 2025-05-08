@@ -1,32 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { fetchMenuItems, MenuItemType } from '~/utils/menuItems'
+
 
 export const Route = createFileRoute('/menu')({
-  component: RouteComponent,
   loader: async () => {
-    console.log('Fetching menu items')
-    return {
-      menuItems: [
-        {
-          id: 1,
-          name: 'Bruschetta',
-          description: 'Grilled bread topped with tomato, basil, and olive oil',
-          price: 6.50,
-          category: 'Appetizer',
-          available: true,
-        },
-      ],
-    }
-  }
+
+    const items = await fetchMenuItems()
+
+    return { menuItems: items }
+  },
+  component: RouteComponent,
 })
 
 function RouteComponent() {
+  // Destructure menuItems from loader data
+  const { menuItems } = Route.useLoaderData()
 
-  const { menuItems } = Route.useLoaderData();
   return (
     <div>
       {menuItems.map(item => (
-        <div key={item.id}>
-          <p>{item.name}</p>
+        <div key={item.slug} className="p-4 border-b">
+          <h3 className="text-lg font-semibold">{item.name}</h3>
+          <p className="text-sm text-gray-600">{item.description}</p>
+          <p className="mt-1 font-medium">${item.price}</p>
         </div>
       ))}
     </div>
