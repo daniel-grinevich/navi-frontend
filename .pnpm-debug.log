@@ -1,0 +1,21 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 error pnpm": {
+    "code": "ELIFECYCLE",
+    "errno": "ENOENT",
+    "syscall": "spawn",
+    "file": "sh",
+    "pkgid": "tanstack-start-example-basic@",
+    "stage": "start",
+    "script": "vinxi start",
+    "pkgname": "tanstack-start-example-basic",
+    "err": {
+      "name": "Error",
+      "message": "tanstack-start-example-basic@ start: `vinxi start`\nspawn ENOENT",
+      "code": "ELIFECYCLE",
+      "stack": "Error: tanstack-start-example-basic@ start: `vinxi start`\nspawn ENOENT\n    at ChildProcess.<anonymous> (/Users/jamesridgeway/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:93073:22)\n    at ChildProcess.emit (node:events:524:28)\n    at maybeClose (node:internal/child_process:1101:16)\n    at ChildProcess._handle.onexit (node:internal/child_process:304:5)"
+    }
+  }
+}
