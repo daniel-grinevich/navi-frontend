@@ -3,8 +3,6 @@ import { fetchMenuItems,fetchFakeMenuItems } from '~/utils/menuItems'
 import MenuItem from '~/components/MenuItem'
 
 
-
-
 export const Route = createFileRoute('/menu')({
   loader: async () => {
 
