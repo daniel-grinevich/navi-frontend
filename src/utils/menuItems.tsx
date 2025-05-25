@@ -1,27 +1,13 @@
 import { createServerFn } from '@tanstack/react-start'
 import { drfAuth }         from './drfAuthMiddleware'
-<<<<<<< HEAD
-=======
 import fakeMenuItems from '../menuitems.json'
->>>>>>> 523d4d01fd73ec5ac2247f74577eeca5704c5ba3
 
 export interface MenuItemType {
   slug: string;
   name: string;
   status: string;
-<<<<<<< HEAD
-  created_at: string;    // ISO timestamp
-  updated_at: string;    // ISO timestamp
-  created_by: number;
-  updated_by: number;
-  image: string;         // URL to image
-  body: string;
-  description: string;
-  price: string;         // e.g. "34.00"
-  ingredients: any[];    // adjust to a more specific type if you know the shape
-=======
   created_at: string;
-  updated_at: string;
+  updated_at: string;    
   created_by: number;
   updated_by: number;
   image: string;
@@ -29,8 +15,8 @@ export interface MenuItemType {
   description: string;
   price: string;
   ingredients: any[];
->>>>>>> 523d4d01fd73ec5ac2247f74577eeca5704c5ba3
 }
+
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
@@ -55,13 +41,9 @@ export const fetchMenuItems = createServerFn({ method: 'GET' })
     }
 
     return JSON.parse(text) as MenuItemType[]
-<<<<<<< HEAD
-  })
-=======
-  });
 
+  })
 
 export const fetchFakeMenuItems = createServerFn({ method: 'GET' }).handler(async () => {
   return fakeMenuItems
 })
->>>>>>> 523d4d01fd73ec5ac2247f74577eeca5704c5ba3

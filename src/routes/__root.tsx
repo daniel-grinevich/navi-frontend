@@ -104,28 +104,26 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <nav> 
           <ul>
             <li>
-            <Link
-            to="/shoppingCart"
-            activeProps={{
-              className: 'font-bold',
-            }}
-            activeOptions={{ exact: true }}
-          >
-<<<<<<< HEAD
-=======
-            Cart
-          </Link>
+              <Link
+                to="/shoppingCart"
+                activeProps={{
+                  className: 'font-bold',
+                }}
+                activeOptions={{ exact: true }}
+              >
+            
+              </Link>
             </li>
             <li>
             <Link
-            to="/menu"
-            activeProps={{
-              className: 'font-bold',
-            }}
-            activeOptions={{ exact: true }}
-          >
-            Menu
-          </Link>
+              to="/menu"
+              activeProps={{
+                className: 'font-bold',
+              }}
+              activeOptions={{ exact: true }}
+            >
+              Menu
+            </Link>
             </li>
           </ul>
         </nav>
@@ -137,7 +135,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             }}
             activeOptions={{ exact: true }}
           >
->>>>>>> 523d4d01fd73ec5ac2247f74577eeca5704c5ba3
             Home
           </Link>{' '}
         </div>
