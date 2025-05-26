@@ -11,6 +11,13 @@ import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 export const Route = createRootRoute({
   head: () => ({
@@ -63,7 +70,6 @@ export const Route = createRootRoute({
 })
 
 function RootComponent() {
-
   const [csrfReady, setCsrfReady] = React.useState(false)
 
   React.useEffect(() => {
@@ -101,7 +107,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <nav> 
+        <nav>
           <ul>
             <li>
               <Link
@@ -110,20 +116,18 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   className: 'font-bold',
                 }}
                 activeOptions={{ exact: true }}
-              >
-            
-              </Link>
+              ></Link>
             </li>
             <li>
-            <Link
-              to="/menu"
-              activeProps={{
-                className: 'font-bold',
-              }}
-              activeOptions={{ exact: true }}
-            >
-              Menu
-            </Link>
+              <Link
+                to="/menu"
+                activeProps={{
+                  className: 'font-bold',
+                }}
+                activeOptions={{ exact: true }}
+              >
+                Menu
+              </Link>
             </li>
           </ul>
         </nav>
