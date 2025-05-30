@@ -16,6 +16,7 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query'
+import useCsrf from '~/hooks/useCsrf'
 
 const queryClient = new QueryClient()
 
@@ -70,29 +71,6 @@ export const Route = createRootRoute({
 })
 
 function RootComponent() {
-  const [csrfReady, setCsrfReady] = React.useState(false)
-
-  React.useEffect(() => {
-    fetch(`${import.meta.env.VITE_NAVI_API_URL}/api/auth/csrf/`, {
-      method: 'GET',
-      credentials: 'include',
-    })
-      .catch((err) => {
-        console.error('CSRF fetch failed', err)
-      })
-      .finally(() => {
-        setCsrfReady(true)
-      })
-  }, [])
-
-  if (!csrfReady) {
-    return (
-      <RootDocument>
-        <div>loading...</div>
-      </RootDocument>
-    )
-  }
-
   return (
     <RootDocument>
       <Outlet />
