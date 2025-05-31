@@ -1,6 +1,7 @@
 import { createFileRoute, useLoaderData } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import MenuItemsForm from '~/components/menu/MenuItemsForm'
+import MenuItem from '~/components/MenuItem'
+import React from 'react'
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
@@ -44,13 +45,25 @@ export const Route = createFileRoute('/menu')({
 
 function MenuPage() {
   const { menuItems } = Route.useLoaderData()
+  const [cart, setCart] = React.useState([])
+
+  const effect = () => {
+    console.log('effect')
+  }
 
   return (
-    <div>
-      <h1>Menu Items</h1>
-      {menuItems.map((item) => (
-        <p key={item.slug}>{item.name}</p>
-      ))}
+    <div className="p-3">
+      <h1 className="text-3xl">Menu Items</h1>
+      <div className="grid grid-cols-3 gap-3 my-3">
+        {menuItems.map((menuItem) => (
+          <MenuItem
+            key={menuItem.slug}
+            menuItem={menuItem}
+            effect={effect}
+            imgSize={{ height: '150px', width: '150px' }}
+          />
+        ))}
+      </div>
     </div>
   )
 }

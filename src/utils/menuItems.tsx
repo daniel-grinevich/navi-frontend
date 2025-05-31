@@ -1,29 +1,27 @@
 import { createServerFn } from '@tanstack/react-start'
-import { drfAuth }         from './drfAuthMiddleware'
+import { drfAuth } from './drfAuthMiddleware'
 import fakeMenuItems from '../menuitems.json'
 
 export interface MenuItemType {
-  slug: string;
-  name: string;
-  status: string;
-  created_at: string;
-  updated_at: string;    
-  created_by: number;
-  updated_by: number;
-  image: string;
-  body: string;
-  description: string;
-  price: string;
-  ingredients: any[];
+  slug: string
+  name: string
+  status: string
+  created_at: string
+  updated_at: string
+  created_by: number
+  updated_by: number
+  image: string
+  body: string
+  description: string
+  price: string
+  ingredients: any[]
 }
-
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
 export const fetchMenuItems = createServerFn({ method: 'GET' })
   .middleware([drfAuth])
   .handler(async ({ context }) => {
-
     const url = `${API_URL}/api/menu_items/`
 
     console.log('Fetching menu items from', url, 'with token', context.token)
@@ -41,9 +39,10 @@ export const fetchMenuItems = createServerFn({ method: 'GET' })
     }
 
     return JSON.parse(text) as MenuItemType[]
-
   })
 
-export const fetchFakeMenuItems = createServerFn({ method: 'GET' }).handler(async () => {
-  return fakeMenuItems
-})
+export const fetchFakeMenuItems = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    return fakeMenuItems
+  }
+)
