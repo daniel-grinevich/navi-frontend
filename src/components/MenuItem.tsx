@@ -1,17 +1,47 @@
-interface MenuItemProps {
-    name: string;
-    description: string;
-    price: number;
+import { MenuItemType } from '~/routes/menu'
+
+type MenuItemProps = {
+  menuItem: MenuItemType | null
+  onMenuItemClick: (name: string) => void
+  imgSize: {
+    height: string
+    width: string
+  }
+}
+
+export default function MenuItem({
+  menuItem,
+  onMenuItemClick,
+  imgSize,
+}: MenuItemProps) {
+  const handleClick = (name: string) => {
+    onMenuItemClick(name)
   }
 
-export default function MenuItem({name,description,price}:MenuItemProps) {
+  if (menuItem === null) {
+    return
+  }
 
-
-    return (
-        <div>
-          <h3 className="text-lg font-semibold">{name}</h3>
-          <p className="text-sm text-gray-600">{description}</p>
-          <p className="mt-1 font-medium">${price}</p>
-        </div>
-    )
+  return (
+    <button
+      type="button"
+      onClick={() => handleClick(menuItem.name)}
+      className="flex flex-row w-full border p-3 items-center gap-3 text-left hover:border-1 hover:border-indigo-500"
+    >
+      <div className="menu-item-img flex-shrink-0">
+        <img
+          src={menuItem.image}
+          alt={menuItem.name}
+          height={imgSize.height}
+          width={imgSize.width}
+          className="object-cover rounded"
+        />
+      </div>
+      <div className="menu-item-info flex flex-col">
+        <h2 className="font-semibold text-lg">{menuItem.name}</h2>
+        <p className="text-sm text-gray-300">{menuItem.description}</p>
+        <p className="mt-1 font-medium">{menuItem.price}</p>
+      </div>
+    </button>
+  )
 }
