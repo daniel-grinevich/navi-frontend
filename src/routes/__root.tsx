@@ -17,6 +17,7 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import useCsrf from '~/hooks/useCsrf'
+import CartContextProvider from '~/context/CartContext'
 
 const queryClient = new QueryClient()
 
@@ -72,9 +73,13 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
+    <QueryClientProvider client={queryClient}>
+      <CartContextProvider>
+        <RootDocument>
+          <Outlet />
+        </RootDocument>
+      </CartContextProvider>
+    </QueryClientProvider>
   )
 }
 
@@ -94,7 +99,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   className: 'font-bold',
                 }}
                 activeOptions={{ exact: true }}
-              ></Link>
+              >
+                Cart
+              </Link>
             </li>
             <li>
               <Link
