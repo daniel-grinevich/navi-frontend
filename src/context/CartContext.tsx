@@ -27,7 +27,15 @@ interface CartProviderProps {
   children: ReactNode
 }
 
-const initialState: CartType = []
+const getInitialCart = (): CartType => {
+  try {
+    const storedCart = localStorage.getItem('cart')
+    const parsed = storedCart ? JSON.parse(storedCart) : []
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
 
 export const cartContext = React.createContext<
   [CartType, React.Dispatch<CartAction>] | undefined
@@ -79,7 +87,35 @@ function reducer(cart: CartType, action: CartAction): CartType {
 }
 
 export function CartContextProvider({ children }: CartProviderProps) {
-  const [cart, dispatch] = useReducer(reducer, initialState)
+  const [cart, dispatch] = useReducer(reducer, [], getInitialCart)
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('cart', JSON.stringify(cart))
+    } catch (e) {
+      console.error('Failed to save cart to localStorage', e)
+    }
+  }, [cart])
+
+  React.useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'cart' && e.newValue) {
+        try {
+          const newCart: CartType = JSON.parse(e.newValue)
+          dispatch({ type: 'CLEAR_CART' }) // clear current state
+          newCart.forEach((item) =>
+            dispatch({ type: 'ADD_ITEM', payload: { item } })
+          )
+        } catch (err) {
+          console.error('Failed to sync cart from localStorage', err)
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
   return (
     <cartContext.Provider value={[cart, dispatch]}>
       {children}
