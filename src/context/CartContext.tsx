@@ -16,7 +16,7 @@ export type CartType = OrderItemType[]
 
 type CartAction =
   | { type: 'ADD_ITEM'; payload: { item: OrderItemType } }
-  | { type: 'REMOVE_ITEM'; payload: { item: OrderItemType } }
+  | { type: 'REMOVE_ITEM'; payload: { id: string } }
   | {
       type: 'UPDATE'
       payload: { id: string; updatedItem: Partial<OrderItemType> }
@@ -29,7 +29,7 @@ interface CartProviderProps {
 
 const initialState: CartType = []
 
-const cartContext = React.createContext<
+export const cartContext = React.createContext<
   [CartType, React.Dispatch<CartAction>] | undefined
 >(undefined)
 
@@ -66,7 +66,7 @@ function reducer(cart: CartType, action: CartAction): CartType {
     }
 
     case 'REMOVE_ITEM': {
-      return cart.filter((item) => item.id !== action.payload.item.id)
+      return cart.filter((item) => item.id !== action.payload.id)
     }
 
     case 'CLEAR_CART': {
@@ -78,7 +78,7 @@ function reducer(cart: CartType, action: CartAction): CartType {
   }
 }
 
-function CartContextProvider({ children }: CartProviderProps) {
+export function CartContextProvider({ children }: CartProviderProps) {
   const [cart, dispatch] = useReducer(reducer, initialState)
   return (
     <cartContext.Provider value={[cart, dispatch]}>
@@ -87,4 +87,10 @@ function CartContextProvider({ children }: CartProviderProps) {
   )
 }
 
-export default CartContextProvider
+export function useCart() {
+  const context = React.useContext(cartContext)
+  if (!context) {
+    throw new Error('useCart must be used within a CartContextProvider')
+  }
+  return context
+}

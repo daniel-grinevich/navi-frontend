@@ -17,7 +17,7 @@ import {
   useQuery,
 } from '@tanstack/react-query'
 import useCsrf from '~/hooks/useCsrf'
-import CartContextProvider from '~/context/CartContext'
+import { CartContextProvider } from '~/context/CartContext'
 
 const queryClient = new QueryClient()
 
