@@ -5,6 +5,8 @@ import React from 'react'
 import Categories from '~/components/menu/Categories'
 import FilterOptions from '~/components/FilterOptions'
 import Search from '~/components/Search'
+import { useCart } from '~/context/CartContext'
+import { OrderItemType } from '~/context/CartContext'
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
@@ -63,6 +65,7 @@ function MenuPage() {
   const [activeCategory, setActiveCategory] = React.useState('')
   const [activeFilters, setActiveFilters] = React.useState<FilterOption[]>([])
   const [searchInput, setSearchInput] = React.useState('')
+  const [_, dispatch] = useCart()
 
   const handleCategoryClick = (category: string) => {
     if (category !== activeCategory) {
@@ -79,7 +82,15 @@ function MenuPage() {
   }
 
   const handleMenuItemClick = (name: string) => {
-    console.log('effect')
+    const menuItem = menuItems.find((item) => item.name === name)
+    if (!menuItem) return
+    const newItem: OrderItemType = {
+      id: crypto.randomUUID(),
+      menuItem: menuItem, // your MenuItemType
+      quantity: 1,
+      customizations: [],
+    }
+    dispatch({ type: 'ADD_ITEM', payload: { item: newItem } })
   }
 
   const seachedMenuItems = React.useMemo(() => {
