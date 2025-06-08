@@ -1,12 +1,14 @@
-import { createFileRoute, useLoaderData } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  useLoaderData,
+  useNavigate,
+} from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import MenuItem from '~/components/MenuItem'
 import React from 'react'
 import Categories from '~/components/menu/Categories'
 import FilterOptions from '~/components/FilterOptions'
 import Search from '~/components/Search'
-import { useCart } from '~/context/CartContext'
-import { OrderItemType } from '~/context/CartContext'
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
@@ -46,7 +48,7 @@ const fetchMenuItems = createServerFn({ method: 'GET' }).handler(async () => {
   return data as [MenuItemType]
 })
 
-export const Route = createFileRoute('/menu')({
+export const Route = createFileRoute('/menu/')({
   component: MenuPage,
   loader: async () => {
     const menuItems = await fetchMenuItems()
@@ -65,7 +67,7 @@ function MenuPage() {
   const [activeCategory, setActiveCategory] = React.useState('')
   const [activeFilters, setActiveFilters] = React.useState<FilterOption[]>([])
   const [searchInput, setSearchInput] = React.useState('')
-  const [_, dispatch] = useCart()
+  const navigate = useNavigate()
 
   const handleCategoryClick = (category: string) => {
     if (category !== activeCategory) {
@@ -80,17 +82,12 @@ function MenuPage() {
   const handleFilterChange = (filters: FilterOption[]) => {
     setActiveFilters(filters)
   }
-
-  const handleMenuItemClick = (name: string) => {
-    const menuItem = menuItems.find((item) => item.name === name)
-    if (!menuItem) return
-    const newItem: OrderItemType = {
-      id: crypto.randomUUID(),
-      menuItem: menuItem, // your MenuItemType
-      quantity: 1,
-      customizations: [],
+  const handleMenuItemClick = (menuSlug: string | undefined) => {
+    console.log('Made it', menuSlug)
+    if (menuSlug === undefined) {
+      return null
     }
-    dispatch({ type: 'ADD_ITEM', payload: { item: newItem } })
+    navigate({ to: '/menu/$slug', params: { slug: menuSlug } })
   }
 
   const seachedMenuItems = React.useMemo(() => {
@@ -141,7 +138,6 @@ function MenuPage() {
       return 0
     })
   }, [categoryMenuItems, activeFilters])
-
   return (
     <div className="p-3">
       <Categories
@@ -157,7 +153,7 @@ function MenuPage() {
           <MenuItem
             key={index}
             menuItem={menuItem}
-            onMenuItemClick={handleMenuItemClick}
+            onMenuItemClick={() => handleMenuItemClick(menuItem?.slug)}
             imgSize={{ height: '150px', width: '150px' }}
           />
         ))}
