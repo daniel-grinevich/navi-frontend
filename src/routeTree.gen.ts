@@ -12,8 +12,9 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as ShoppingCartImport } from './routes/shoppingCart'
-import { Route as MenuImport } from './routes/menu'
 import { Route as IndexImport } from './routes/index'
+import { Route as MenuIndexImport } from './routes/menu/index'
+import { Route as MenuSlugImport } from './routes/menu/$slug'
 
 // Create/Update Routes
 
@@ -23,15 +24,21 @@ const ShoppingCartRoute = ShoppingCartImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const MenuRoute = MenuImport.update({
-  id: '/menu',
-  path: '/menu',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MenuIndexRoute = MenuIndexImport.update({
+  id: '/menu/',
+  path: '/menu/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MenuSlugRoute = MenuSlugImport.update({
+  id: '/menu/$slug',
+  path: '/menu/$slug',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -46,18 +53,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/menu': {
-      id: '/menu'
-      path: '/menu'
-      fullPath: '/menu'
-      preLoaderRoute: typeof MenuImport
-      parentRoute: typeof rootRoute
-    }
     '/shoppingCart': {
       id: '/shoppingCart'
       path: '/shoppingCart'
       fullPath: '/shoppingCart'
       preLoaderRoute: typeof ShoppingCartImport
+      parentRoute: typeof rootRoute
+    }
+    '/menu/$slug': {
+      id: '/menu/$slug'
+      path: '/menu/$slug'
+      fullPath: '/menu/$slug'
+      preLoaderRoute: typeof MenuSlugImport
+      parentRoute: typeof rootRoute
+    }
+    '/menu/': {
+      id: '/menu/'
+      path: '/menu'
+      fullPath: '/menu'
+      preLoaderRoute: typeof MenuIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -67,42 +81,47 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/menu': typeof MenuRoute
   '/shoppingCart': typeof ShoppingCartRoute
+  '/menu/$slug': typeof MenuSlugRoute
+  '/menu': typeof MenuIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/menu': typeof MenuRoute
   '/shoppingCart': typeof ShoppingCartRoute
+  '/menu/$slug': typeof MenuSlugRoute
+  '/menu': typeof MenuIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/menu': typeof MenuRoute
   '/shoppingCart': typeof ShoppingCartRoute
+  '/menu/$slug': typeof MenuSlugRoute
+  '/menu/': typeof MenuIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/menu' | '/shoppingCart'
+  fullPaths: '/' | '/shoppingCart' | '/menu/$slug' | '/menu'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/menu' | '/shoppingCart'
-  id: '__root__' | '/' | '/menu' | '/shoppingCart'
+  to: '/' | '/shoppingCart' | '/menu/$slug' | '/menu'
+  id: '__root__' | '/' | '/shoppingCart' | '/menu/$slug' | '/menu/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  MenuRoute: typeof MenuRoute
   ShoppingCartRoute: typeof ShoppingCartRoute
+  MenuSlugRoute: typeof MenuSlugRoute
+  MenuIndexRoute: typeof MenuIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  MenuRoute: MenuRoute,
   ShoppingCartRoute: ShoppingCartRoute,
+  MenuSlugRoute: MenuSlugRoute,
+  MenuIndexRoute: MenuIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -116,18 +135,22 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/menu",
-        "/shoppingCart"
+        "/shoppingCart",
+        "/menu/$slug",
+        "/menu/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/menu": {
-      "filePath": "menu.tsx"
-    },
     "/shoppingCart": {
       "filePath": "shoppingCart.tsx"
+    },
+    "/menu/$slug": {
+      "filePath": "menu/$slug.tsx"
+    },
+    "/menu/": {
+      "filePath": "menu/index.tsx"
     }
   }
 }
