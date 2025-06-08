@@ -1,9 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router'
+import React from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { useQuery } from '@tanstack/react-query'
-import RowSkeleton from '~/components/skeletons/RowSkeleton'
+import { OrderItemType } from '~/context/CartContext'
+import { useCart } from '~/context/CartContext'
+import CustomizationGroup from '~/components/CustomizationGroup'
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
+
+export interface OrderCustomizationType {
+  customization: string
+  quantity: number
+  unit_price: number
+}
 
 export interface CustomizationType {
   name: string
@@ -18,7 +27,7 @@ export interface CustomizationType {
   slug: string
 }
 
-interface CustomizationGroupType {
+export interface CustomizationGroupType {
   name: string
   category: number[]
   description: string
@@ -42,7 +51,18 @@ interface Category {
 interface MenuCustomizationsPayload {
   name: string
   slug: string
+  status: string
+  image: string
+  body: string
+  description: string
+  price: number
+  ingredients: any[]
   category: Category
+}
+
+export interface SelectedCustomizationType {
+  group: string
+  customization: string
 }
 
 export const Route = createFileRoute('/menu/$slug')({
@@ -62,18 +82,79 @@ const fetchMenuItem = createServerFn({ method: 'GET' })
     if (!res.ok) throw new Error('Error fetching menu item')
 
     const data = await res.json()
+    console.log(data)
 
     return data as MenuCustomizationsPayload
   })
 
 function MenuItemDetail() {
+  const navigate = useNavigate()
   const { slug } = Route.useParams()
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['menuDetail', slug],
     queryFn: () => fetchMenuItem({ data: slug }),
   })
+  const [_, cartDispatch] = useCart()
+  const [selectedCustomizations, setSelectedCustomizations] = React.useState<
+    SelectedCustomizationType[] | []
+  >([])
 
   if (isError) return <div>Error: {String(error)}</div>
+
+  const handleSubmit = () => {
+    if (data === undefined) {
+      return null
+    }
+    const newItem: OrderItemType = {
+      id: crypto.randomUUID(),
+      menuItem: {
+        name: data.name,
+        slug: data.slug,
+        status: data.status,
+        description: data.description,
+        image: data.image,
+        body: data.body,
+        price: data.price,
+        ingredients: data.ingredients,
+        category_name: null,
+        created_at: null,
+        updated_at: null,
+        created_by: null,
+        updated_by: null,
+      }, // your MenuItemType
+      quantity: 1,
+      customizations: selectedCustomizations.map((selectedCustomization) => {
+        return { name: selectedCustomization.customization, quantity: 1 }
+      }),
+    }
+    cartDispatch({ type: 'ADD_ITEM', payload: { item: newItem } })
+    navigate({ to: '/menu' })
+  }
+
+  const handleCancel = () => {}
+
+  const handleSelect = (group: string, customization: string) => {
+    if (group == undefined || customization == undefined) {
+      return null
+    }
+    const existing = selectedCustomizations.find((selectedCustomization) => {
+      selectedCustomization.group === group
+    })
+    if (!existing) {
+      setSelectedCustomizations([
+        ...selectedCustomizations,
+        { group, customization },
+      ])
+    } else {
+      setSelectedCustomizations(
+        selectedCustomizations.map((selectedCustomization) =>
+          selectedCustomization.group === group
+            ? { group, customization }
+            : selectedCustomization
+        )
+      )
+    }
+  }
 
   return (
     <div>
@@ -87,41 +168,26 @@ function MenuItemDetail() {
 
       {data?.category.customization_groups.map((group) => (
         <section key={group.slug}>
-          <h2>{group.name}</h2>
-          <Customizations
-            allOptions={isLoading ? null : group.customizations}
+          <CustomizationGroup
+            customizationGroup={isLoading ? null : group}
+            selected={selectedCustomizations.find((selectedCustomization) => {
+              selectedCustomization.group == group.slug
+            })}
+            onSelect={(selectedCustomization: string) =>
+              handleSelect(group.slug, selectedCustomization)
+            }
           />
         </section>
       ))}
+      <button className="text-red-500" onClick={handleCancel}>
+        Cancel
+      </button>
+      <button
+        className="bg-green-500 text-white px-4 py-2 rounded"
+        onClick={handleSubmit}
+      >
+        Add to Cart
+      </button>
     </div>
-  )
-}
-
-interface CustomizationsProps {
-  allOptions: CustomizationType[] | null
-}
-
-function Customizations({ allOptions }: CustomizationsProps) {
-  if (allOptions === null) {
-    return <RowSkeleton />
-  }
-
-  const handleClick = (name: string) => {
-    console.log('you clicked', name)
-  }
-
-  return (
-    <ul className="flex flex-row gap-3 border p-3">
-      {allOptions.map((option, index) => (
-        <li key={`${option.slug}-${index}`}>
-          <button
-            className="border p-1"
-            onClick={() => handleClick(option.name)}
-          >
-            {option.name}
-          </button>
-        </li>
-      ))}
-    </ul>
   )
 }

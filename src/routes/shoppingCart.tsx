@@ -1,6 +1,7 @@
 import React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import ShoppingCart from '~/components/ShoppingCart'
+import ShoppingCartItem from '~/components/ShoppingCartItem'
+import { useCart } from '~/context/CartContext'
 
 interface CustomizationsCartItem {
   name: string
@@ -19,29 +20,8 @@ export const Route = createFileRoute('/shoppingCart')({
   component: ShoppingCartPage,
 })
 
-const cartItems: MenuCartItem[] = [
-  {
-    name: 'Black Coffee',
-    unitPrice: 2.99,
-    quantity: 2,
-    customizations: null,
-  },
-  {
-    name: 'Latte',
-    unitPrice: 4.25,
-    quantity: 1,
-    customizations: [
-      {
-        name: 'Size',
-        unitPrice: 1.25,
-        quantity: 0,
-      },
-    ],
-  },
-]
-
 function ShoppingCartPage() {
-  const [cart, setCart] = React.useState(cartItems)
+  const [cart, dispatch] = useCart()
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -52,8 +32,8 @@ function ShoppingCartPage() {
       <h1 className="text-2xl font-semibold mb-4">Your Shopping Cart</h1>
       <form onSubmit={(e) => handleSubmit(e)}>
         <li>
-          {cart.map((item, index) => (
-            <ul key={index}>{item.name}</ul>
+          {cart.map((orderItem, index) => (
+            <ShoppingCartItem orderItem={orderItem} />
           ))}
         </li>
       </form>

@@ -16,15 +16,15 @@ export interface MenuItemType {
   slug: string
   name: string
   status: string
-  category_name: string
-  created_at: string
-  updated_at: string
-  created_by: number
-  updated_by: number
+  category_name: string | null
+  created_at: string | null
+  updated_at: string | null
+  created_by: number | null
+  updated_by: number | null
   image: string
   body: string
   description: string
-  price: string
+  price: number
   ingredients: any[]
 }
 
