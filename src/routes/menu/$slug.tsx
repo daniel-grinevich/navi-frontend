@@ -1,27 +1,47 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import MenuItem from '~/components/MenuItem'
 import { createServerFn } from '@tanstack/react-start'
-import { MenuItemType } from '.'
-import { mockCustomizationGroups, mockCustomizations } from '~/staticData'
-import MenuItemCustomizations from '~/components/MenuItemCustomizations'
+import { useQuery } from '@tanstack/react-query'
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
 export interface CustomizationType {
   name: string
-  group: CustomizationGroupType
+  group: number
   description: string
   display_order: number
   price: number
+  created_at: Date
+  created_by: number
+  updated_at: Date
+  updated_by: number
+  slug: string
 }
 
-export interface CustomizationGroupType {
+interface CustomizationGroupType {
   name: string
-  category: string
+  category: number[]
   description: string
   display_order: number
   is_required: boolean
+  created_at: Date
+  created_by: number
+  updated_at: Date
+  updated_by: number
+  slug: string
+  customizations: CustomizationType[]
+}
+
+interface Category {
+  id: number
+  name: string
+  slug: string
+  customization_groups: CustomizationGroupType[]
+}
+
+interface MenuCustomizationsPayload {
+  name: string
+  slug: string
+  category: Category
 }
 
 export const Route = createFileRoute('/menu/$slug')({
@@ -31,7 +51,7 @@ export const Route = createFileRoute('/menu/$slug')({
 const fetchMenuItem = createServerFn({ method: 'GET' })
   .validator((data: string) => data)
   .handler(async (ctx) => {
-    const menuItemsUrl = `${API_URL}/api/menu_items/${ctx.data}`
+    const menuItemsUrl = `${API_URL}/api/menu_items/${ctx.data}/category-customizations/`
 
     const res = await fetch(menuItemsUrl, {
       method: 'GET',
@@ -42,23 +62,33 @@ const fetchMenuItem = createServerFn({ method: 'GET' })
 
     const data = await res.json()
 
-    return data as MenuItemType
+    return data as MenuCustomizationsPayload
   })
 
 function MenuItemDetail() {
   const { slug } = Route.useParams()
-  const { data } = useSuspenseQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['menuDetail', slug],
     queryFn: () => fetchMenuItem({ data: slug }),
   })
+
+  if (isLoading) return <div>Loading menu…</div>
+  if (isError) return <div>Error: {String(error)}</div>
+  if (!data) return <div>No menu found.</div>
+
   return (
     <div>
-      {data.name}
-      <MenuItemCustomizations
-        menuItem={data}
-        customizationGroups={mockCustomizationGroups}
-        customizations={mockCustomizations}
-      />
+      <h1>{data.name}</h1>
+      {data.category.customization_groups.map((group) => (
+        <section key={group.slug}>
+          <h2>{group.name}</h2>
+          {group.customizations.map((c) => (
+            <div key={c.slug}>
+              {c.name} — ${c.price}
+            </div>
+          ))}
+        </section>
+      ))}
     </div>
   )
 }
