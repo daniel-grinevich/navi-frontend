@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { useQuery } from '@tanstack/react-query'
+import RowSkeleton from '~/components/skeletons/RowSkeleton'
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
@@ -72,23 +73,55 @@ function MenuItemDetail() {
     queryFn: () => fetchMenuItem({ data: slug }),
   })
 
-  if (isLoading) return <div>Loading menu…</div>
   if (isError) return <div>Error: {String(error)}</div>
-  if (!data) return <div>No menu found.</div>
 
   return (
     <div>
-      <h1>{data.name}</h1>
-      {data.category.customization_groups.map((group) => (
+      <h1>
+        {isLoading ? (
+          <span className="h-8 w-48 bg-gray-200 animate-pulse inline-block" />
+        ) : (
+          data!.name
+        )}
+      </h1>
+
+      {data?.category.customization_groups.map((group) => (
         <section key={group.slug}>
           <h2>{group.name}</h2>
-          {group.customizations.map((c) => (
-            <div key={c.slug}>
-              {c.name} — ${c.price}
-            </div>
-          ))}
+          <Customizations
+            allOptions={isLoading ? null : group.customizations}
+          />
         </section>
       ))}
     </div>
+  )
+}
+
+interface CustomizationsProps {
+  allOptions: CustomizationType[] | null
+}
+
+function Customizations({ allOptions }: CustomizationsProps) {
+  if (allOptions === null) {
+    return <RowSkeleton />
+  }
+
+  const handleClick = (name: string) => {
+    console.log('you clicked', name)
+  }
+
+  return (
+    <ul className="flex flex-row gap-3 border p-3">
+      {allOptions.map((option, index) => (
+        <li key={`${option.slug}-${index}`}>
+          <button
+            className="border p-1"
+            onClick={() => handleClick(option.name)}
+          >
+            {option.name}
+          </button>
+        </li>
+      ))}
+    </ul>
   )
 }
