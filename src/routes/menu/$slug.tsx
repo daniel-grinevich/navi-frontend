@@ -121,7 +121,7 @@ function MenuItemDetail() {
         updated_at: null,
         created_by: null,
         updated_by: null,
-      }, // your MenuItemType
+      },
       quantity: 1,
       customizations: selectedCustomizations.map((selectedCustomization) => {
         return { name: selectedCustomization.customization, quantity: 1 }
@@ -131,7 +131,9 @@ function MenuItemDetail() {
     navigate({ to: '/menu' })
   }
 
-  const handleCancel = () => {}
+  const handleCancel = () => {
+    navigate({ to: '/menu' })
+  }
 
   const handleSelect = (group: string, customization: string) => {
     if (group == undefined || customization == undefined) {
@@ -166,28 +168,27 @@ function MenuItemDetail() {
         )}
       </h1>
 
-      {data?.category.customization_groups.map((group) => (
-        <section key={group.slug}>
-          <CustomizationGroup
-            customizationGroup={isLoading ? null : group}
-            selected={selectedCustomizations.find((selectedCustomization) => {
-              selectedCustomization.group == group.slug
-            })}
-            onSelect={(selectedCustomization: string) =>
-              handleSelect(group.slug, selectedCustomization)
-            }
-          />
-        </section>
-      ))}
-      <button className="text-red-500" onClick={handleCancel}>
-        Cancel
-      </button>
-      <button
-        className="bg-green-500 text-white px-4 py-2 rounded"
-        onClick={handleSubmit}
-      >
-        Add to Cart
-      </button>
+      <form onSubmit={handleSubmit}>
+        {data?.category.customization_groups.map((group) => (
+          <section key={group.slug}>
+            <CustomizationGroup
+              customizationGroup={isLoading ? null : group}
+              onSelect={(selectedCustomization: string) =>
+                handleSelect(group.slug, selectedCustomization)
+              }
+            />
+          </section>
+        ))}
+        <button className="text-red-500" type="button" onClick={handleCancel}>
+          Cancel
+        </button>
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded"
+          type="submit"
+        >
+          Add to Cart
+        </button>
+      </form>
     </div>
   )
 }
