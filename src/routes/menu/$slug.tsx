@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { OrderItemType } from '~/context/CartContext'
 import { useCart } from '~/context/CartContext'
 import CustomizationGroup from '~/components/CustomizationGroup'
+import { ONE_DAY_MS, ONE_HOUR_MS } from '~/constants/api'
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
@@ -33,6 +34,7 @@ export interface CustomizationGroupType {
   description: string
   display_order: number
   is_required: boolean
+  allow_multiple: boolean
   created_at: Date
   created_by: number
   updated_at: Date
@@ -93,6 +95,8 @@ function MenuItemDetail() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['menuDetail', slug],
     queryFn: () => fetchMenuItem({ data: slug }),
+    staleTime: ONE_DAY_MS,
+    gcTime: ONE_HOUR_MS,
   })
   const [_, cartDispatch] = useCart()
   const [selectedCustomizations, setSelectedCustomizations] = React.useState<
@@ -131,10 +135,6 @@ function MenuItemDetail() {
     navigate({ to: '/menu' })
   }
 
-  const handleCancel = () => {
-    navigate({ to: '/menu' })
-  }
-
   const handleSelect = (group: string, customization: string) => {
     if (group == undefined || customization == undefined) {
       return null
@@ -164,7 +164,7 @@ function MenuItemDetail() {
         {isLoading ? (
           <span className="h-8 w-48 bg-gray-200 animate-pulse inline-block" />
         ) : (
-          data!.name
+          'Customizations'
         )}
       </h1>
 
@@ -179,7 +179,11 @@ function MenuItemDetail() {
             />
           </section>
         ))}
-        <button className="text-red-500" type="button" onClick={handleCancel}>
+        <button
+          className="text-red-500"
+          type="button"
+          onClick={() => navigate({ to: '/menu' })}
+        >
           Cancel
         </button>
         <button
