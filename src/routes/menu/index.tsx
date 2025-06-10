@@ -9,65 +9,35 @@ import React from 'react'
 import Categories from '~/components/menu/Categories'
 import FilterOptions from '~/components/FilterOptions'
 import Search from '~/components/Search'
-
-const API_URL = import.meta.env.VITE_NAVI_API_URL!
-
-export interface MenuItemType {
-  slug: string
-  name: string
-  status: string
-  category_name: string | null
-  created_at: string | null
-  updated_at: string | null
-  created_by: number | null
-  updated_by: number | null
-  image: string
-  body: string
-  description: string
-  price: number
-  ingredients: any[]
-}
+import useMenu from '~/hooks/useMenu'
 
 interface FilterOption {
   name: string
   direction: 'none' | 'asc' | 'desc'
 }
 
-const fetchMenuItems = createServerFn({ method: 'GET' }).handler(async () => {
-  const menuItemsUrl = `${API_URL}/api/menu_items/`
-
-  const res = await fetch(menuItemsUrl, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  })
-
-  if (!res.ok) throw new Error('Error fetching menu items')
-
-  const data = await res.json()
-
-  return data as [MenuItemType]
-})
-
 export const Route = createFileRoute('/menu/')({
   component: MenuPage,
-  loader: async () => {
-    const menuItems = await fetchMenuItems()
-    let categories: string[] = []
-    menuItems.map((m) => {
-      if (m.category_name !== null) {
-        categories = [...categories, m.category_name]
-      }
-    })
-    return { menuItems, categories }
-  },
 })
 
 function MenuPage() {
-  const { menuItems, categories } = Route.useLoaderData()
   const [activeCategory, setActiveCategory] = React.useState('')
   const [activeFilters, setActiveFilters] = React.useState<FilterOption[]>([])
   const [searchInput, setSearchInput] = React.useState('')
   const navigate = useNavigate()
+  const { data: menuItems = [], isLoading, isError } = useMenu()
+
+  const categories = React.useMemo(
+    () =>
+      Array.from(
+        new Set(
+          menuItems
+            .map((m) => m.category_name)
+            .filter((cat): cat is string => Boolean(cat))
+        )
+      ),
+    [menuItems]
+  )
 
   const handleCategoryClick = (category: string) => {
     if (category !== activeCategory) {
@@ -138,6 +108,9 @@ function MenuPage() {
       return 0
     })
   }, [categoryMenuItems, activeFilters])
+
+  if (isLoading) return <div>Loading…</div>
+  if (isError) return <div>Error loading menu</div>
   return (
     <div className="p-3">
       <Categories

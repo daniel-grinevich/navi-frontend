@@ -3,7 +3,7 @@ import {
   Link,
   Outlet,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import * as React from 'react'
@@ -11,17 +11,13 @@ import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from '@tanstack/react-query'
 import useCsrf from '~/hooks/useCsrf'
+import type { QueryClient } from '@tanstack/react-query'
 import { CartContextProvider } from '~/context/CartContext'
 
-const queryClient = new QueryClient()
-
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient
+}>()({
   head: () => ({
     meta: [
       {
@@ -73,13 +69,11 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <CartContextProvider>
-        <RootDocument>
-          <Outlet />
-        </RootDocument>
-      </CartContextProvider>
-    </QueryClientProvider>
+    <CartContextProvider>
+      <RootDocument>
+        <Outlet />
+      </RootDocument>
+    </CartContextProvider>
   )
 }
 

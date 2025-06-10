@@ -19,7 +19,7 @@ export interface MenuItemType {
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
-export const fetchMenuItems = createServerFn({ method: 'GET' })
+export const fetchMenudItems = createServerFn({ method: 'GET' })
   .middleware([drfAuth])
   .handler(async ({ context }) => {
     const url = `${API_URL}/api/menu_items/`
