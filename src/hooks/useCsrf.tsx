@@ -2,8 +2,8 @@ import React from 'react'
 
 const API_BASE = import.meta.env.VITE_NAVI_API_URL
 
-export default function useCsrf(): boolean {
-  const [csrfReady, setCsrfReady] = React.useState(false)
+export default function useCsrf(): string {
+  const [csrfToken, setCsrfToken] = React.useState('')
 
   React.useEffect(() => {
     let ignore = false
@@ -21,7 +21,8 @@ export default function useCsrf(): boolean {
         }
 
         if (!ignore) {
-          setCsrfReady(true)
+          const data = await res.json()
+          setCsrfToken(data.csrfToken)
         }
       } catch (error) {
         console.error('Error fetching CSRF token:', error)
@@ -35,5 +36,5 @@ export default function useCsrf(): boolean {
     }
   }, [])
 
-  return csrfReady
+  return csrfToken
 }

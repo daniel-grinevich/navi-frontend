@@ -4,7 +4,7 @@ import {
   useNavigate,
 } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import MenuItem from '~/components/MenuItem'
+import MenuItem from '~/components/menu/MenuItem'
 import React from 'react'
 import Categories from '~/components/menu/Categories'
 import FilterOptions from '~/components/FilterOptions'
