@@ -11,16 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as ShoppingCartImport } from './routes/shoppingCart'
+import { Route as CartImport } from './routes/cart'
 import { Route as IndexImport } from './routes/index'
 import { Route as MenuIndexImport } from './routes/menu/index'
 import { Route as MenuSlugImport } from './routes/menu/$slug'
 
 // Create/Update Routes
 
-const ShoppingCartRoute = ShoppingCartImport.update({
-  id: '/shoppingCart',
-  path: '/shoppingCart',
+const CartRoute = CartImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,11 +53,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/shoppingCart': {
-      id: '/shoppingCart'
-      path: '/shoppingCart'
-      fullPath: '/shoppingCart'
-      preLoaderRoute: typeof ShoppingCartImport
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartImport
       parentRoute: typeof rootRoute
     }
     '/menu/$slug': {
@@ -81,14 +81,14 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/shoppingCart': typeof ShoppingCartRoute
+  '/cart': typeof CartRoute
   '/menu/$slug': typeof MenuSlugRoute
   '/menu': typeof MenuIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/shoppingCart': typeof ShoppingCartRoute
+  '/cart': typeof CartRoute
   '/menu/$slug': typeof MenuSlugRoute
   '/menu': typeof MenuIndexRoute
 }
@@ -96,30 +96,30 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/shoppingCart': typeof ShoppingCartRoute
+  '/cart': typeof CartRoute
   '/menu/$slug': typeof MenuSlugRoute
   '/menu/': typeof MenuIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/shoppingCart' | '/menu/$slug' | '/menu'
+  fullPaths: '/' | '/cart' | '/menu/$slug' | '/menu'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/shoppingCart' | '/menu/$slug' | '/menu'
-  id: '__root__' | '/' | '/shoppingCart' | '/menu/$slug' | '/menu/'
+  to: '/' | '/cart' | '/menu/$slug' | '/menu'
+  id: '__root__' | '/' | '/cart' | '/menu/$slug' | '/menu/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ShoppingCartRoute: typeof ShoppingCartRoute
+  CartRoute: typeof CartRoute
   MenuSlugRoute: typeof MenuSlugRoute
   MenuIndexRoute: typeof MenuIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ShoppingCartRoute: ShoppingCartRoute,
+  CartRoute: CartRoute,
   MenuSlugRoute: MenuSlugRoute,
   MenuIndexRoute: MenuIndexRoute,
 }
@@ -135,7 +135,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/shoppingCart",
+        "/cart",
         "/menu/$slug",
         "/menu/"
       ]
@@ -143,8 +143,8 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
-    "/shoppingCart": {
-      "filePath": "shoppingCart.tsx"
+    "/cart": {
+      "filePath": "cart.tsx"
     },
     "/menu/$slug": {
       "filePath": "menu/$slug.tsx"
