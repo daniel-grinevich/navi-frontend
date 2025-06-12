@@ -3,8 +3,24 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useCart } from '~/hooks/useCart'
 import CartItem from '~/components/CartItem'
 import { useAuth } from '~/hooks/useAuth'
+import { API_URL } from '~/constants/api'
 
-const API_URL = import.meta.env.VITE_NAVI_API_URL!
+interface OrderCustomizationPayload {
+  customization: string
+  quantity: number
+}
+
+interface OrderItemPayload {
+  menu_item: string
+  quantity: number
+  unit_price: string
+  customizations?: OrderCustomizationPayload[]
+}
+
+interface OrderPayload {
+  navi_port: number
+  items: OrderItemPayload[]
+}
 
 export const Route = createFileRoute('/cart')({
   component: CartPage,
@@ -17,6 +33,19 @@ function CartPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    const payload: OrderPayload = {
+      navi_port: 1,
+      items: cart.map((item) => ({
+        menu_item: item.menuItem.name,
+        quantity: item.quantity,
+        unit_price: item.menuItem.price.toString(),
+        customizations: item.customizations.map((c) => ({
+          customization: c.name,
+          quantity: c.quantity,
+        })),
+      })),
+    }
+
     const tokenString = `Token ${authToken}`
 
     const orderRes = await fetch(`${API_URL}/api/orders/`, {
@@ -26,10 +55,7 @@ function CartPage() {
         'Content-Type': 'application/json',
         ['Authorization']: tokenString,
       },
-      body: JSON.stringify({
-        navi_port: 1,
-        items: cart,
-      }),
+      body: JSON.stringify(payload),
     })
 
     if (!orderRes.ok) {
