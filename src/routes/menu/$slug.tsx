@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { useQuery } from '@tanstack/react-query'
 import { OrderItemType } from '~/context/CartContext'
-import { useCart } from '~/context/CartContext'
+import { useCart } from '~/hooks/useCart'
 import CustomizationGroup from '~/components/CustomizationGroup'
 import { ONE_DAY_MS, ONE_HOUR_MS } from '~/constants/api'
 
@@ -105,7 +105,8 @@ function MenuItemDetail() {
 
   if (isError) return <div>Error: {String(error)}</div>
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
     if (data === undefined) {
       return null
     }
@@ -120,7 +121,7 @@ function MenuItemDetail() {
         body: data.body,
         price: data.price,
         ingredients: data.ingredients,
-        category_name: null,
+        category_name: '',
         created_at: null,
         updated_at: null,
         created_by: null,
@@ -168,7 +169,7 @@ function MenuItemDetail() {
         )}
       </h1>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         {data?.category.customization_groups.map((group) => (
           <section key={group.slug}>
             <CustomizationGroup

@@ -1,5 +1,5 @@
 import React, { ReactNode, useReducer } from 'react'
-import { MenuItemType } from '~/routes/menu'
+import { MenuItemType } from '~/utils/menu/fetchMenuItems'
 
 export interface OrderCustomizationType {
   name: string
@@ -27,15 +27,15 @@ interface CartProviderProps {
   children: ReactNode
 }
 
-const getInitialCart = (): CartType => {
-  try {
-    const storedCart = localStorage.getItem('cart')
-    const parsed = storedCart ? JSON.parse(storedCart) : []
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
-}
+// const getInitialCart = (): CartType => {
+//   try {
+//     const storedCart = localStorage.getItem('cart')
+//     const parsed = storedCart ? JSON.parse(storedCart) : []
+//     return Array.isArray(parsed) ? parsed : []
+//   } catch {
+//     return []
+//   }
+// }
 
 export const cartContext = React.createContext<
   [CartType, React.Dispatch<CartAction>] | undefined
@@ -87,7 +87,21 @@ function reducer(cart: CartType, action: CartAction): CartType {
 }
 
 export function CartContextProvider({ children }: CartProviderProps) {
-  const [cart, dispatch] = useReducer(reducer, [], getInitialCart)
+  const [cart, dispatch] = useReducer(reducer, [])
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem('cart')
+      if (stored) {
+        dispatch({ type: 'CLEAR_CART' })
+        JSON.parse(stored).forEach((item: OrderItemType) =>
+          dispatch({ type: 'ADD_ITEM', payload: { item } })
+        )
+      }
+    } catch {
+      /* swallow */
+    }
+  }, [])
 
   React.useEffect(() => {
     try {
@@ -121,12 +135,4 @@ export function CartContextProvider({ children }: CartProviderProps) {
       {children}
     </cartContext.Provider>
   )
-}
-
-export function useCart() {
-  const context = React.useContext(cartContext)
-  if (!context) {
-    throw new Error('useCart must be used within a CartContextProvider')
-  }
-  return context
 }

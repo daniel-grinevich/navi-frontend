@@ -1,13 +1,8 @@
 import React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import ShoppingCartItem from '~/components/CartItem'
-import { useCart } from '~/context/CartContext'
-import useCsrf from '~/hooks/useCsrf'
-import { createServerFn } from '@tanstack/react-start'
-import { drfLoginMiddleware } from '~/middleware/drfAuthMiddleware'
-import { OrderPayload } from '~/utils/cart/createOrder'
-import { useMutation } from '@tanstack/react-query'
-import { useCreateOrder } from '~/hooks/useCreateOrder'
+import { useCart } from '~/hooks/useCart'
+import CartItem from '~/components/CartItem'
+import { useAuth } from '~/hooks/useAuth'
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL!
 
@@ -16,40 +11,20 @@ export const Route = createFileRoute('/cart')({
 })
 
 function CartPage() {
+  const { authToken } = useAuth()
   const [cart, dispatch] = useCart()
-  const { mutate, status, error } = useCreateOrder()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    let { csrfToken } = await fetch(`${API_URL}/api/auth/csrf/`, {
-      credentials: 'include',
-    }).then((r) => r.json())
-
-    const loginRes = await fetch(`${API_URL}/api/login/`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      body: JSON.stringify({
-        username: 'test@test.com',
-        password: 'test',
-      }),
-    })
-    if (!loginRes.ok) {
-      throw new Error(`Login failed: ${loginRes.status}`)
-    }
-
-    ;({ csrfToken } = await loginRes.json())
+    const tokenString = `Token ${authToken}`
 
     const orderRes = await fetch(`${API_URL}/api/orders/`, {
       method: 'POST',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
+        ['Authorization']: tokenString,
       },
       body: JSON.stringify({
         navi_port: 1,
@@ -58,15 +33,12 @@ function CartPage() {
     })
 
     if (!orderRes.ok) {
-      const text = await orderRes.text()
-      throw new Error(`Order failed: ${orderRes.status} — ${text}`)
+      throw new Error(`Order failed:`)
     }
 
     const json = await orderRes.json()
     console.log('Order success!', json)
   }
-
-  if (status === 'error') return <p>Error: {(error as Error).message}</p>
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -75,7 +47,7 @@ function CartPage() {
         <ul className="divide-y divide-gray-200 mb-6">
           {cart.map((orderItem, index) => (
             <li key={index}>
-              <ShoppingCartItem orderItem={orderItem} />
+              <CartItem orderItem={orderItem} />
             </li>
           ))}
         </ul>

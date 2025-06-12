@@ -13,7 +13,7 @@ import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
 import type { QueryClient } from '@tanstack/react-query'
 import { CartContextProvider } from '~/context/CartContext'
-import { useCart } from '~/context/CartContext'
+import { AuthContextProvider } from '~/context/AuthContext'
 import { Coffee } from 'lucide-react'
 
 export const Route = createRootRouteWithContext<{
@@ -70,16 +70,18 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
   return (
-    <CartContextProvider>
-      <RootDocument>
-        <Outlet />
-      </RootDocument>
-    </CartContextProvider>
+    <AuthContextProvider>
+      <CartContextProvider>
+        <RootDocument>
+          <Outlet />
+        </RootDocument>
+      </CartContextProvider>
+    </AuthContextProvider>
   )
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const [cartState] = useCart()
+  // const [cartState] = useCart()
 
   // const totalCartItems = React.useMemo(() => {
   //   return cartState.reduce((sum, item) => sum + item.quantity, 0)

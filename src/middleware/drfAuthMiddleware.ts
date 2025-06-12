@@ -9,7 +9,6 @@ export const drfLoginMiddleware = createMiddleware({ type: 'function' }).client(
     })
     const { csrfToken } = await res.json()
 
-    console.log('CSRF TOKEN LOGIN MIDDLE WARE', csrfToken)
     const resp = await fetch(`${API_URL}/api/login/`, {
       method: 'POST',
       credentials: 'include',
@@ -24,7 +23,6 @@ export const drfLoginMiddleware = createMiddleware({ type: 'function' }).client(
 
     const { session_key } = await resp.json()
 
-    console.log('RESPONSE SUCCESSFUL??')
     return next({ sendContext: { token: csrfToken, session: session_key } })
   }
 )
