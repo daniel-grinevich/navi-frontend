@@ -1,6 +1,6 @@
 import React from 'react'
-import { useCart } from '~/context/CartContext'
 import { OrderItemType } from '~/context/CartContext'
+import { useCart } from '~/hooks/useCart'
 
 interface ShoppingCartItemProps {
   orderItem: OrderItemType
