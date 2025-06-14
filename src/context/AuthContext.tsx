@@ -1,3 +1,4 @@
+import { validateHeaderName } from 'http'
 import React from 'react'
 
 const API_URL = import.meta.env.VITE_NAVI_API_URL
@@ -18,13 +19,6 @@ export function AuthContextProvider({
 }) {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false)
   const [authToken, setAuthToken] = React.useState('')
-
-  React.useEffect(() => {
-    const userToken = localStorage.getItem('userToken')
-    const guestToken = localStorage.getItem('guestToken')
-    setAuthToken(userToken || guestToken || '')
-    setIsAuthenticated(!userToken)
-  }, [])
 
   const login = async (username: string, password: string) => {
     if (!username || !password) {
@@ -57,24 +51,35 @@ export function AuthContextProvider({
   }
 
   React.useEffect(() => {
-    const getGuestToken = async () => {
+    const storedUser = localStorage.getItem('userToken')
+    if (storedUser && storedUser !== 'null') {
+      console.log('inside stored user?')
+      setAuthToken(storedUser)
+      setIsAuthenticated(true)
+      return
+    }
+
+    const storedGuest = localStorage.getItem('guestToken')
+    if (storedGuest && storedGuest !== 'null') {
+      setAuthToken(storedGuest)
+      return
+    }
+
+    const fetchGuestToken = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/login/`, {
+        const res = await fetch(`${API_URL}/api/login/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: USERNAME, password: PASSWORD }),
         })
-        if (!response.ok) {
-          throw new Error('Error fetching guest token')
-        }
-        const { token } = await response.json()
+        const { token } = await res.json()
         localStorage.setItem('guestToken', token)
         setAuthToken(token)
-      } catch (error) {
-        console.error('Error fetching guest token:', error)
+      } catch (err) {
+        console.error(err)
       }
     }
-    getGuestToken()
+    fetchGuestToken()
   }, [])
 
   return (

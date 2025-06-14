@@ -105,7 +105,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   activeOptions={{ exact: true }}
                 >
                   Home
-                </Link>{' '}
+                </Link>
               </li>
               <li className="p-3 text-lg">
                 <Link
@@ -116,6 +116,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   activeOptions={{ exact: true }}
                 >
                   Menu
+                </Link>
+              </li>
+              <li className="p-3 text-lg">
+                <Link
+                  to="/orders"
+                  activeProps={{
+                    className: 'font-bold',
+                  }}
+                  activeOptions={{ exact: true }}
+                >
+                  Orders
                 </Link>
               </li>
               <li className="relative text-lg">
