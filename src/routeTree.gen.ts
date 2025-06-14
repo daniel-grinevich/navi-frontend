@@ -8,90 +8,38 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as OrdersIndexRouteImport } from './routes/orders/index'
+import { Route as MenuIndexRouteImport } from './routes/menu/index'
+import { Route as MenuSlugRouteImport } from './routes/menu/$slug'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as CartImport } from './routes/cart'
-import { Route as IndexImport } from './routes/index'
-import { Route as OrdersIndexImport } from './routes/orders/index'
-import { Route as MenuIndexImport } from './routes/menu/index'
-import { Route as MenuSlugImport } from './routes/menu/$slug'
-
-// Create/Update Routes
-
-const CartRoute = CartImport.update({
+const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const OrdersIndexRoute = OrdersIndexImport.update({
+const OrdersIndexRoute = OrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const MenuIndexRoute = MenuIndexImport.update({
+const MenuIndexRoute = MenuIndexRouteImport.update({
   id: '/menu/',
   path: '/menu/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const MenuSlugRoute = MenuSlugImport.update({
+const MenuSlugRoute = MenuSlugRouteImport.update({
   id: '/menu/$slug',
   path: '/menu/$slug',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartImport
-      parentRoute: typeof rootRoute
-    }
-    '/menu/$slug': {
-      id: '/menu/$slug'
-      path: '/menu/$slug'
-      fullPath: '/menu/$slug'
-      preLoaderRoute: typeof MenuSlugImport
-      parentRoute: typeof rootRoute
-    }
-    '/menu/': {
-      id: '/menu/'
-      path: '/menu'
-      fullPath: '/menu'
-      preLoaderRoute: typeof MenuIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/orders/': {
-      id: '/orders/'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof OrdersIndexImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -100,7 +48,6 @@ export interface FileRoutesByFullPath {
   '/menu': typeof MenuIndexRoute
   '/orders': typeof OrdersIndexRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cart': typeof CartRoute
@@ -108,16 +55,14 @@ export interface FileRoutesByTo {
   '/menu': typeof MenuIndexRoute
   '/orders': typeof OrdersIndexRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cart': typeof CartRoute
   '/menu/$slug': typeof MenuSlugRoute
   '/menu/': typeof MenuIndexRoute
   '/orders/': typeof OrdersIndexRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/cart' | '/menu/$slug' | '/menu' | '/orders'
@@ -126,13 +71,52 @@ export interface FileRouteTypes {
   id: '__root__' | '/' | '/cart' | '/menu/$slug' | '/menu/' | '/orders/'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CartRoute: typeof CartRoute
   MenuSlugRoute: typeof MenuSlugRoute
   MenuIndexRoute: typeof MenuIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders/': {
+      id: '/orders/'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/menu/': {
+      id: '/menu/'
+      path: '/menu'
+      fullPath: '/menu'
+      preLoaderRoute: typeof MenuIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/menu/$slug': {
+      id: '/menu/$slug'
+      path: '/menu/$slug'
+      fullPath: '/menu/$slug'
+      preLoaderRoute: typeof MenuSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -142,39 +126,6 @@ const rootRouteChildren: RootRouteChildren = {
   MenuIndexRoute: MenuIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/cart",
-        "/menu/$slug",
-        "/menu/",
-        "/orders/"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/cart": {
-      "filePath": "cart.tsx"
-    },
-    "/menu/$slug": {
-      "filePath": "menu/$slug.tsx"
-    },
-    "/menu/": {
-      "filePath": "menu/index.tsx"
-    },
-    "/orders/": {
-      "filePath": "orders/index.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */
