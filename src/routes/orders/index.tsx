@@ -2,6 +2,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '~/hooks/useAuth'
 import { API_URL } from '~/constants/api'
+import OrderCard from '~/components/OrderCard'
+import NoData from '~/components/NoData'
+import React from 'react'
+import { QRCodeSVG } from 'qrcode.react'
+import { X } from 'lucide-react'
 
 interface Customization {
   order_item: number
@@ -21,7 +26,7 @@ interface Item {
 interface Order {
   slug: string
   price: number
-  created_at: string
+  created_at: Date
   items: Item[]
 }
 
@@ -41,7 +46,7 @@ const fetchOrders = async (authToken: string) => {
     )
   }
 
-  return await response.json()
+  return (await response.json()) as Array<Order>
 }
 
 export const Route = createFileRoute('/orders/')({
@@ -54,49 +59,73 @@ function OrdersPage() {
     queryKey: ['orders', authToken],
     queryFn: () => fetchOrders(authToken),
   })
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [selectedSlug, setSelectedSlug] = React.useState('')
+  const ref = React.useRef<HTMLDivElement>(null)
+
+  const handleCancel = React.useCallback((slug: string) => {
+     
+  }, [])
+
+  const handleQrClick = React.useCallback((slug: string) => {
+    setSelectedSlug(slug)
+    setIsOpen(true)
+  }, [])
+
+  const handleCloseModal = () => {
+    setIsOpen(false)
+    setSelectedSlug('')
+  }
+
+  React.useEffect(() => {
+    if (isOpen !== true) return
+
+    const handleEvent = (e: MouseEvent | TouchEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false)
+        setSelectedSlug('')
+      }
+    }
+    document.addEventListener('pointerdown', handleEvent)
+
+    return () => {
+      document.removeEventListener('pointerdown', handleEvent)
+    }
+  }, [isOpen])
+
   if (!authToken) return <div>Loading...</div>
   if (isLoading) return <div>Loading...</div>
   if (isError) return <div>Something went wrong...</div>
+  if (!data || data.length === 0)
+    return (
+      <NoData
+        headerText="You have no orders!"
+        bodyText=""
+        buttonText="Start an Order"
+        url="/menu"
+      />
+    )
   return (
-    <div>
+    <div className="flex flex-col justify-center p-4 gap-3">
       {data.map((order) => (
-        <div
+        <OrderCard
           key={order.slug}
-          style={{ border: '1px solid #ccc', margin: 8, padding: 8 }}
-        >
-          <h2>Order #{order.slug}</h2>
-          <p>
-            Placed at:{' '}
-            {new Date(order.created_at).toLocaleString(undefined, {
-              dateStyle: 'short',
-              timeStyle: 'short',
-            })}
-          </p>
-          <p>
-            <strong>Total:</strong> ${order.price.toFixed(2)}
-          </p>
-
-          <h3>Items</h3>
-          <ul>
-            {order.items.map((it) => (
-              <li key={it.slug}>
-                {it.menu_item} × {it.quantity} @ $
-                {parseFloat(it.unit_price).toFixed(2)} each
-                {it.customizations.length > 0 && (
-                  <ul style={{ marginLeft: 16 }}>
-                    {it.customizations.map((c, i) => (
-                      <li key={i}>
-                        {c.customization} × {c.quantity} @ $
-                        {parseFloat(c.unit_price).toFixed(2)}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+          order={order}
+          onQrClick={handleQrClick}
+          onCancel={}
+        />
       ))}
+      {isOpen && (
+        <div
+          ref={ref}
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-white border p-4 rounded"
+        >
+          <button type="button" onClick={handleCloseModal}>
+            <X color="red" />
+          </button>
+          <QRCodeSVG value={selectedSlug} />
+        </div>
+      )}
     </div>
   )
 }

@@ -52,8 +52,8 @@ function MenuPage() {
   const handleFilterChange = (filters: FilterOption[]) => {
     setActiveFilters(filters)
   }
+
   const handleMenuItemClick = (menuSlug: string | undefined) => {
-    console.log('Made it', menuSlug)
     if (menuSlug === undefined) {
       return null
     }
