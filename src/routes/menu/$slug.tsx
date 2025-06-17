@@ -69,6 +69,12 @@ export interface SelectedCustomizationType {
 
 export const Route = createFileRoute('/menu/$slug')({
   component: MenuItemDetail,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      orderItemId:
+        typeof search.orderItemId === 'string' ? search.orderItemId : undefined,
+    }
+  },
 })
 
 const fetchMenuItem = createServerFn({ method: 'GET' })
@@ -92,16 +98,42 @@ const fetchMenuItem = createServerFn({ method: 'GET' })
 function MenuItemDetail() {
   const navigate = useNavigate()
   const { slug } = Route.useParams()
+  const { orderItemId }: { orderItemId?: string } = Route.useSearch()
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['menuDetail', slug],
     queryFn: () => fetchMenuItem({ data: slug }),
     staleTime: ONE_DAY_MS,
     gcTime: ONE_HOUR_MS,
   })
-  const [_, cartDispatch] = useCart()
+  const [cart, cartDispatch] = useCart()
   const [selectedCustomizations, setSelectedCustomizations] = React.useState<
     SelectedCustomizationType[] | []
   >([])
+
+  React.useEffect(() => {
+    if (!orderItemId || !data) return
+    const orderItem = cart.find(
+      (item) => String(item.id) === String(orderItemId)
+    )
+    if (!orderItem) return
+
+    const updatedSelections = orderItem.customizations.map((customization) => {
+      const matchedGroup = data.category.customization_groups.find((group) =>
+        group.customizations.some(
+          (customizationInGroup) =>
+            customization.name === customizationInGroup.name
+        )
+      )
+
+      return {
+        group: matchedGroup?.slug ?? '',
+        customization: customization.name,
+      }
+    })
+    console.log(updatedSelections)
+
+    setSelectedCustomizations(updatedSelections)
+  }, [orderItemId, cart, data])
 
   if (isError) return <div>Error: {String(error)}</div>
 
@@ -176,6 +208,10 @@ function MenuItemDetail() {
               customizationGroup={isLoading ? null : group}
               onSelect={(selectedCustomization: string) =>
                 handleSelect(group.slug, selectedCustomization)
+              }
+              selectedCustomization={
+                selectedCustomizations.find((c) => c.group === group.slug)
+                  ?.customization ?? ''
               }
             />
           </section>

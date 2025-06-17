@@ -57,7 +57,7 @@ function MenuPage() {
     if (menuSlug === undefined) {
       return null
     }
-    navigate({ to: '/menu/$slug', params: { slug: menuSlug } })
+    navigate({ to: '/menu/$slug', params: { slug: menuSlug } }) //Rec from docs: an adapter is provided for Zod which will pipe through the correct input type and output type
   }
 
   const seachedMenuItems = React.useMemo(() => {
