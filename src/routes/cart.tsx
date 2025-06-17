@@ -1,9 +1,10 @@
 import React from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useCart } from '~/hooks/useCart'
 import CartItem from '~/components/CartItem'
 import { useAuth } from '~/hooks/useAuth'
 import { API_URL } from '~/constants/api'
+import { QRCodeSVG } from 'qrcode.react'
 
 interface OrderCustomizationPayload {
   customization: string
@@ -28,7 +29,8 @@ export const Route = createFileRoute('/cart')({
 
 function CartPage() {
   const { authToken } = useAuth()
-  const [cart, dispatch] = useCart()
+  const [cart, cartDispatch] = useCart()
+  const [orderId, setOrderId] = React.useState(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,30 +59,41 @@ function CartPage() {
       },
       body: JSON.stringify(payload),
     })
-
     if (!orderRes.ok) {
       throw new Error(`Order failed:`)
     }
 
     const json = await orderRes.json()
-    console.log('Order success!', json)
+    const slug = json.slug
+    setOrderId(slug)
+    cartDispatch({ type: 'CLEAR_CART' })
   }
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Your Shopping Cart</h1>
-      <form onSubmit={handleSubmit} method="POST">
-        <ul className="divide-y divide-gray-200 mb-6">
-          {cart.map((orderItem, index) => (
-            <li key={index}>
-              <CartItem orderItem={orderItem} />
-            </li>
-          ))}
-        </ul>
+      {orderId ? (
+        <QRCodeSVG value={orderId} />
+      ) : (
+        <div>
+          <h1 className="text-3xl font-bold mb-6">Your Shopping Cart</h1>
+          <form onSubmit={handleSubmit} method="POST">
+            <ul className="divide-y divide-gray-200 mb-6">
+              {cart.map((orderItem, index) => (
+                <li key={index}>
+                  <Link
+                    to="/menu/$slug"
+                    params={{ slug: orderItem.menuItem.slug }}
+                    search={{ orderItemId: orderItem.id }}
+                  >
+                    <CartItem orderItem={orderItem} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
 
-        <button
-          type="submit"
-          className="
+            <button
+              type="submit"
+              className="
             w-full
             bg-blue-600 hover:bg-blue-700 
             text-white font-semibold 
@@ -89,10 +102,12 @@ function CartPage() {
             transition 
             duration-200
           "
-        >
-          Place Your Order
-        </button>
-      </form>
+            >
+              Place Your Order
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   )
 }
