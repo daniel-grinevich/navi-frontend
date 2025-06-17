@@ -9,21 +9,21 @@ import {
 interface MenuItemCustomizationsProps {
   customizationGroup: CustomizationGroupType | null
   onSelect: (customization: string) => void
+  selectedCustomization: string
 }
 
 export default function CustomizationGroup({
   customizationGroup,
   onSelect,
+  selectedCustomization,
 }: MenuItemCustomizationsProps) {
   if (customizationGroup === null) {
     return <RowSkeleton />
   }
 
-  const [selected, setSelected] = React.useState('')
   const customizations = customizationGroup.customizations
 
   const handleClick = (option: string) => {
-    setSelected(option)
     onSelect(option)
   }
 
@@ -35,7 +35,7 @@ export default function CustomizationGroup({
           <li key={`${customization.slug}-${index}`}>
             <button
               className={`border p-1 rounded ${
-                selected === customization.name
+                selectedCustomization === customization.name
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-black'
               }`}
