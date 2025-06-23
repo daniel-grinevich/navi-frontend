@@ -110,6 +110,7 @@ function MenuItemDetail() {
     SelectedCustomizationType[] | []
   >([])
 
+  //Setting customizations if we are editing a cart item
   React.useEffect(() => {
     if (!orderItemId || !data) return
     const orderItem = cart.find(
@@ -142,53 +143,94 @@ function MenuItemDetail() {
     if (data === undefined) {
       return null
     }
-    const newItem: OrderItemType = {
-      id: crypto.randomUUID(),
-      menuItem: {
-        name: data.name,
-        slug: data.slug,
-        status: data.status,
-        description: data.description,
-        image: data.image,
-        body: data.body,
-        price: data.price,
-        ingredients: data.ingredients,
-        category_name: '',
-        created_at: null,
-        updated_at: null,
-        created_by: null,
-        updated_by: null,
-      },
-      quantity: 1,
-      customizations: selectedCustomizations.map((selectedCustomization) => {
-        return { name: selectedCustomization.customization, quantity: 1 }
-      }),
+
+    if (orderItemId) {
+      //update item if we are editing
+      const customizations = selectedCustomizations.map(
+        (selectedCustomization) => {
+          return {
+            name: selectedCustomization.customization,
+            quantity: 1,
+          }
+        }
+      )
+      cartDispatch({
+        type: 'UPDATE',
+        payload: {
+          id: orderItemId,
+          updatedItem: {
+            customizations: customizations,
+          },
+        },
+      })
+      navigate({ to: '/cart' })
+    } else {
+      //Create new item if we are adding a net new item to the cart
+      const newItem: OrderItemType = {
+        id: crypto.randomUUID(),
+        menuItem: {
+          name: data.name,
+          slug: data.slug,
+          status: data.status,
+          description: data.description,
+          image: data.image,
+          body: data.body,
+          price: data.price,
+          ingredients: data.ingredients,
+          category_name: '',
+          created_at: null,
+          updated_at: null,
+          created_by: null,
+          updated_by: null,
+        },
+        quantity: 1,
+        customizations: selectedCustomizations.map((selectedCustomization) => {
+          return { name: selectedCustomization.customization, quantity: 1 }
+        }),
+      }
+      cartDispatch({ type: 'ADD_ITEM', payload: { item: newItem } }) //add in replacing item
+      navigate({ to: '/menu' })
     }
-    cartDispatch({ type: 'ADD_ITEM', payload: { item: newItem } })
-    navigate({ to: '/menu' })
   }
 
-  const handleSelect = (group: string, customization: string) => {
-    if (group == undefined || customization == undefined) {
+  const handleSelect = (groupSlug: string, customization: string) => {
+    if (
+      groupSlug == undefined ||
+      customization == undefined ||
+      data == undefined
+    ) {
       return null
     }
-    const existing = selectedCustomizations.find((selectedCustomization) => {
-      selectedCustomization.group === group
-    })
-    if (!existing) {
-      setSelectedCustomizations([
-        ...selectedCustomizations,
-        { group, customization },
-      ])
-    } else {
-      setSelectedCustomizations(
-        selectedCustomizations.map((selectedCustomization) =>
-          selectedCustomization.group === group
-            ? { group, customization }
-            : selectedCustomization
-        )
+    const group = data.category.customization_groups.find(
+      (g) => g.slug === groupSlug
+    )
+
+    if (!group) return
+    const isMulti = group.allow_multiple
+
+    setSelectedCustomizations((prev) => {
+      const alreadySelected = prev.some(
+        (c) => c.group === groupSlug && c.customization === customization
       )
-    }
+
+      if (alreadySelected) {
+        // Toggle off (remove selection)
+        return prev.filter(
+          (c) => !(c.group === groupSlug && c.customization === customization)
+        )
+      }
+
+      if (!isMulti) {
+        // Single select: replace all for this group
+        return [
+          ...prev.filter((c) => c.group !== groupSlug),
+          { group: groupSlug, customization },
+        ]
+      }
+
+      // Multi-select: add to existing
+      return [...prev, { group: groupSlug, customization }]
+    })
   }
 
   return (
@@ -209,10 +251,9 @@ function MenuItemDetail() {
               onSelect={(selectedCustomization: string) =>
                 handleSelect(group.slug, selectedCustomization)
               }
-              selectedCustomization={
-                selectedCustomizations.find((c) => c.group === group.slug)
-                  ?.customization ?? ''
-              }
+              selectedCustomizations={selectedCustomizations
+                .filter((c) => c.group === group.slug)
+                .map((c) => c.customization)}
             />
           </section>
         ))}

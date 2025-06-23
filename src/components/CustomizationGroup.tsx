@@ -9,13 +9,13 @@ import {
 interface MenuItemCustomizationsProps {
   customizationGroup: CustomizationGroupType | null
   onSelect: (customization: string) => void
-  selectedCustomization: string
+  selectedCustomizations: string[]
 }
 
 export default function CustomizationGroup({
   customizationGroup,
   onSelect,
-  selectedCustomization,
+  selectedCustomizations,
 }: MenuItemCustomizationsProps) {
   if (customizationGroup === null) {
     return <RowSkeleton />
@@ -35,7 +35,7 @@ export default function CustomizationGroup({
           <li key={`${customization.slug}-${index}`}>
             <button
               className={`border p-1 rounded ${
-                selectedCustomization === customization.name
+                selectedCustomizations.includes(customization.name)
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-black'
               }`}
