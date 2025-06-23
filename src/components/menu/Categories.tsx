@@ -19,23 +19,48 @@ export default function Categories({
 
   return (
     <div>
-      <h3 className="text-xl">Categories</h3>
-      <div className="flex flex-row gap-3 border p-3 overflow-x-scroll">
-        {allCategories.map((category, index) => (
-          <button
-            key={index}
-            value={category}
-            className={
-              category === activeCategory
-                ? 'border p-2 border-1 border-indigo-500'
-                : 'border p-2 hover:border-1 hover:border-indigo-500'
-            }
-            onClick={() => handleClick(category)}
-          >
-            {category}
-          </button>
-        ))}
+      <div className="flex flex-row space-x-3 overflow-x-auto py-2 scrollbar-thin scrollbar-thumb-gray-300 lg:flex-col lg:overflow-visible lg:space-x-0 lg:space-y-3 lg:py-0">
+        {allCategories.map((category) => {
+          const isActive = category === activeCategory
+          return (
+            <button
+              key={category}
+              onClick={() => handleClick(category)}
+              className={
+                `text-sm focus:outline-none border-b ` +
+                (isActive ? 'text-blue-600 font-semibold' : 'text-gray-200')
+              }
+            >
+              {category}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
 }
+
+// return (
+//   <div>
+//     <h3 className="text-lg font-medium mb-2">Categories</h3>
+//     <div className="flex space-x-4 overflow-x-auto">
+//       {allCategories.map((category) => {
+//         const isActive = category === activeCategory
+//         return (
+//           <button
+//             key={category}
+//             onClick={() => handleClick(category)}
+//             className={
+//               `text-sm focus:outline-none ` +
+//               (isActive
+//                 ? 'text-indigo-600 font-semibold underline'
+//                 : 'text-gray-700 hover:underline')
+//             }
+//           >
+//             {category}
+//           </button>
+//         )
+//       })}
+//     </div>
+//   </div>
+// )

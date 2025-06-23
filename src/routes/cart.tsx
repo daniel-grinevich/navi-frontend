@@ -69,6 +69,8 @@ function CartPage() {
     cartDispatch({ type: 'CLEAR_CART' })
   }
 
+  if (cart.length === 0) return <div>Empty Cart</div>
+
   return (
     <div className="p-6 max-w-3xl mx-auto">
       {orderId ? (
