@@ -31,11 +31,12 @@ function MenuPage() {
     }
   }
 
-  const handleMenuItemClick = (menuSlug: string | undefined) => {
-    if (menuSlug === undefined) {
-      return null
-    }
-    navigate({ to: '/menu/$slug', params: { slug: menuSlug } }) //Rec from docs: an adapter is provided for Zod which will pipe through the correct input type and output type
+  const handleMenuItemClick = (menuSlug: string) => {
+    navigate({
+      to: '/menu/$slug',
+      params: { slug: menuSlug },
+      search: { orderItemId: undefined },
+    })
   }
 
   const categoryMenuItems = React.useMemo(() => {

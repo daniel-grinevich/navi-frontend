@@ -110,7 +110,6 @@ function MenuItemDetail() {
     SelectedCustomizationType[] | []
   >([])
 
-  //Setting customizations if we are editing a cart item
   React.useEffect(() => {
     if (!orderItemId || !data) return
     const orderItem = cart.find(
@@ -145,7 +144,6 @@ function MenuItemDetail() {
     }
 
     if (orderItemId) {
-      //update item if we are editing
       const customizations = selectedCustomizations.map(
         (selectedCustomization) => {
           return {
@@ -163,9 +161,8 @@ function MenuItemDetail() {
           },
         },
       })
-      navigate({ to: '/cart' })
+      navigate({ to: '/checkout/cart' })
     } else {
-      //Create new item if we are adding a net new item to the cart
       const newItem: OrderItemType = {
         id: crypto.randomUUID(),
         menuItem: {
@@ -188,7 +185,7 @@ function MenuItemDetail() {
           return { name: selectedCustomization.customization, quantity: 1 }
         }),
       }
-      cartDispatch({ type: 'ADD_ITEM', payload: { item: newItem } }) //add in replacing item
+      cartDispatch({ type: 'ADD_ITEM', payload: { item: newItem } })
       navigate({ to: '/menu' })
     }
   }
@@ -214,62 +211,66 @@ function MenuItemDetail() {
       )
 
       if (alreadySelected) {
-        // Toggle off (remove selection)
         return prev.filter(
           (c) => !(c.group === groupSlug && c.customization === customization)
         )
       }
 
       if (!isMulti) {
-        // Single select: replace all for this group
         return [
           ...prev.filter((c) => c.group !== groupSlug),
           { group: groupSlug, customization },
         ]
       }
 
-      // Multi-select: add to existing
       return [...prev, { group: groupSlug, customization }]
     })
   }
 
-  return (
-    <div>
-      <h1>
-        {isLoading ? (
-          <span className="h-8 w-48 bg-gray-200 animate-pulse inline-block" />
-        ) : (
-          'Customizations'
-        )}
-      </h1>
+  if (isLoading) return <div>Is Loading...</div>
+  if (isError) return <div>Error...</div>
 
-      <form onSubmit={(e) => handleSubmit(e)}>
-        {data?.category.customization_groups.map((group) => (
-          <section key={group.slug}>
-            <CustomizationGroup
-              customizationGroup={isLoading ? null : group}
-              onSelect={(selectedCustomization: string) =>
-                handleSelect(group.slug, selectedCustomization)
-              }
-              selectedCustomizations={selectedCustomizations
-                .filter((c) => c.group === group.slug)
-                .map((c) => c.customization)}
-            />
-          </section>
-        ))}
-        <button
-          className="text-red-500"
-          type="button"
-          onClick={() => navigate({ to: '/menu' })}
-        >
-          Cancel
-        </button>
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded"
-          type="submit"
-        >
-          Add to Cart
-        </button>
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-lg p-8 rounded-2xl shadow-xl space-y-6"
+      >
+        <h2 className="text-2xl font-bold text-center">
+          Customize Your {data?.category.name}
+        </h2>
+
+        <div className="space-y-4">
+          {data?.category.customization_groups.map((group) => (
+            <section key={group.slug} className="p-4 rounded-lg border">
+              <h3 className="text-lg font-semibold mb-2">{group.name}</h3>
+              <CustomizationGroup
+                customizationGroup={isLoading ? null : group}
+                onSelect={(selected) => handleSelect(group.slug, selected)}
+                selectedCustomizations={selectedCustomizations
+                  .filter((c) => c.group === group.slug)
+                  .map((c) => c.customization)}
+              />
+            </section>
+          ))}
+        </div>
+
+        <div className="flex justify-between items-center pt-6 border-t">
+          <button
+            type="button"
+            onClick={() => navigate({ to: '/menu' })}
+            className="px-5 py-2 rounded-lg border"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            className="px-6 py-3 rounded-lg font-semibold bg-green-500"
+          >
+            Add to Cart
+          </button>
+        </div>
       </form>
     </div>
   )

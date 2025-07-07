@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import React from 'react'
 import { OrderItemType } from '~/context/CartContext'
 import { useCart } from '~/hooks/useCart'
@@ -8,6 +9,15 @@ interface ShoppingCartItemProps {
 
 export default function CartItem({ orderItem }: ShoppingCartItemProps) {
   const [_, dispatch] = useCart()
+  const navigate = useNavigate()
+
+  const handleEditClick = (slug: string, id: string) => {
+    navigate({
+      to: '/menu/$slug',
+      params: { slug: slug },
+      search: { orderItemId: id },
+    })
+  }
 
   const handleRemove = (id: string) => {
     dispatch({ type: 'REMOVE_ITEM', payload: { id } })
@@ -68,6 +78,13 @@ export default function CartItem({ orderItem }: ShoppingCartItemProps) {
             –
           </button>
         </div>
+        <button
+          type="button"
+          onClick={() => handleEditClick(orderItem.menuItem.slug, orderItem.id)}
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded px-3 py-1 text-sm"
+        >
+          Edit
+        </button>
         <button
           type="button"
           onClick={() => handleRemove(orderItem.id)}
