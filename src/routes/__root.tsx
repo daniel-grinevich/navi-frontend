@@ -9,12 +9,12 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import * as React from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
-import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
 import type { QueryClient } from '@tanstack/react-query'
 import { CartContextProvider } from '~/context/CartContext'
 import { AuthContextProvider } from '~/context/AuthContext'
 import { Coffee } from 'lucide-react'
+import appCss from '~/styles/app.css?url'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -130,7 +130,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 </Link>
               </li>
               <li className="relative text-lg">
-                <Link to="/cart" activeProps={{ className: 'font-bold' }}>
+                <Link
+                  to="/checkout/cart"
+                  activeProps={{ className: 'font-bold' }}
+                >
                   <Coffee />
                 </Link>
                 {/* {totalCartItems > 0 && (

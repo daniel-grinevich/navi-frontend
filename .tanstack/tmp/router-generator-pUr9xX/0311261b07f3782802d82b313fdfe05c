@@ -8,17 +8,20 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as CheckoutRouteRouteImport } from './routes/checkout/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrdersIndexRouteImport } from './routes/orders/index'
 import { Route as MenuIndexRouteImport } from './routes/menu/index'
 import { Route as MenuSlugRouteImport } from './routes/menu/$slug'
 import { Route as CheckoutPaymentRouteImport } from './routes/checkout/payment'
-import { Route as CheckoutCompleteRouteImport } from './routes/checkout/complete'
 import { Route as CheckoutCartRouteImport } from './routes/checkout/cart'
+import { Route as CheckoutLayoutRouteImport } from './routes/checkout/_layout'
 
-const CheckoutRouteRoute = CheckoutRouteRouteImport.update({
+const CheckoutRouteImport = createFileRoute('/checkout')()
+
+const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
   getParentRoute: () => rootRouteImport,
@@ -46,24 +49,22 @@ const MenuSlugRoute = MenuSlugRouteImport.update({
 const CheckoutPaymentRoute = CheckoutPaymentRouteImport.update({
   id: '/payment',
   path: '/payment',
-  getParentRoute: () => CheckoutRouteRoute,
-} as any)
-const CheckoutCompleteRoute = CheckoutCompleteRouteImport.update({
-  id: '/complete',
-  path: '/complete',
-  getParentRoute: () => CheckoutRouteRoute,
+  getParentRoute: () => CheckoutRoute,
 } as any)
 const CheckoutCartRoute = CheckoutCartRouteImport.update({
   id: '/cart',
   path: '/cart',
-  getParentRoute: () => CheckoutRouteRoute,
+  getParentRoute: () => CheckoutRoute,
+} as any)
+const CheckoutLayoutRoute = CheckoutLayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => CheckoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/checkout': typeof CheckoutRouteRouteWithChildren
+  '/checkout': typeof CheckoutLayoutRoute
   '/checkout/cart': typeof CheckoutCartRoute
-  '/checkout/complete': typeof CheckoutCompleteRoute
   '/checkout/payment': typeof CheckoutPaymentRoute
   '/menu/$slug': typeof MenuSlugRoute
   '/menu': typeof MenuIndexRoute
@@ -71,9 +72,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/checkout': typeof CheckoutRouteRouteWithChildren
+  '/checkout': typeof CheckoutLayoutRoute
   '/checkout/cart': typeof CheckoutCartRoute
-  '/checkout/complete': typeof CheckoutCompleteRoute
   '/checkout/payment': typeof CheckoutPaymentRoute
   '/menu/$slug': typeof MenuSlugRoute
   '/menu': typeof MenuIndexRoute
@@ -82,9 +82,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/checkout': typeof CheckoutRouteRouteWithChildren
+  '/checkout': typeof CheckoutRouteWithChildren
+  '/checkout/_layout': typeof CheckoutLayoutRoute
   '/checkout/cart': typeof CheckoutCartRoute
-  '/checkout/complete': typeof CheckoutCompleteRoute
   '/checkout/payment': typeof CheckoutPaymentRoute
   '/menu/$slug': typeof MenuSlugRoute
   '/menu/': typeof MenuIndexRoute
@@ -96,7 +96,6 @@ export interface FileRouteTypes {
     | '/'
     | '/checkout'
     | '/checkout/cart'
-    | '/checkout/complete'
     | '/checkout/payment'
     | '/menu/$slug'
     | '/menu'
@@ -106,7 +105,6 @@ export interface FileRouteTypes {
     | '/'
     | '/checkout'
     | '/checkout/cart'
-    | '/checkout/complete'
     | '/checkout/payment'
     | '/menu/$slug'
     | '/menu'
@@ -115,8 +113,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/checkout'
+    | '/checkout/_layout'
     | '/checkout/cart'
-    | '/checkout/complete'
     | '/checkout/payment'
     | '/menu/$slug'
     | '/menu/'
@@ -125,7 +123,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CheckoutRouteRoute: typeof CheckoutRouteRouteWithChildren
+  CheckoutRoute: typeof CheckoutRouteWithChildren
   MenuSlugRoute: typeof MenuSlugRoute
   MenuIndexRoute: typeof MenuIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
@@ -137,7 +135,7 @@ declare module '@tanstack/react-router' {
       id: '/checkout'
       path: '/checkout'
       fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteRouteImport
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -173,44 +171,44 @@ declare module '@tanstack/react-router' {
       path: '/payment'
       fullPath: '/checkout/payment'
       preLoaderRoute: typeof CheckoutPaymentRouteImport
-      parentRoute: typeof CheckoutRouteRoute
-    }
-    '/checkout/complete': {
-      id: '/checkout/complete'
-      path: '/complete'
-      fullPath: '/checkout/complete'
-      preLoaderRoute: typeof CheckoutCompleteRouteImport
-      parentRoute: typeof CheckoutRouteRoute
+      parentRoute: typeof CheckoutRoute
     }
     '/checkout/cart': {
       id: '/checkout/cart'
       path: '/cart'
       fullPath: '/checkout/cart'
       preLoaderRoute: typeof CheckoutCartRouteImport
-      parentRoute: typeof CheckoutRouteRoute
+      parentRoute: typeof CheckoutRoute
+    }
+    '/checkout/_layout': {
+      id: '/checkout/_layout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutLayoutRouteImport
+      parentRoute: typeof CheckoutRoute
     }
   }
 }
 
-interface CheckoutRouteRouteChildren {
+interface CheckoutRouteChildren {
+  CheckoutLayoutRoute: typeof CheckoutLayoutRoute
   CheckoutCartRoute: typeof CheckoutCartRoute
-  CheckoutCompleteRoute: typeof CheckoutCompleteRoute
   CheckoutPaymentRoute: typeof CheckoutPaymentRoute
 }
 
-const CheckoutRouteRouteChildren: CheckoutRouteRouteChildren = {
+const CheckoutRouteChildren: CheckoutRouteChildren = {
+  CheckoutLayoutRoute: CheckoutLayoutRoute,
   CheckoutCartRoute: CheckoutCartRoute,
-  CheckoutCompleteRoute: CheckoutCompleteRoute,
   CheckoutPaymentRoute: CheckoutPaymentRoute,
 }
 
-const CheckoutRouteRouteWithChildren = CheckoutRouteRoute._addFileChildren(
-  CheckoutRouteRouteChildren,
+const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
+  CheckoutRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CheckoutRouteRoute: CheckoutRouteRouteWithChildren,
+  CheckoutRoute: CheckoutRouteWithChildren,
   MenuSlugRoute: MenuSlugRoute,
   MenuIndexRoute: MenuIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,

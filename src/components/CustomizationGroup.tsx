@@ -29,15 +29,14 @@ export default function CustomizationGroup({
 
   return (
     <div>
-      <h2>{customizationGroup.name}</h2>
-      <ul className="flex flex-row gap-3 border p-3">
+      <ul className="flex flex-row gap-3 p-3">
         {customizations.map((customization, index) => (
           <li key={`${customization.slug}-${index}`}>
             <button
               className={`border p-1 rounded ${
                 selectedCustomizations.includes(customization.name)
                   ? 'bg-blue-600 text-white'
-                  : 'bg-white text-black'
+                  : 'text-white'
               }`}
               type="button"
               onClick={() => handleClick(customization.name)}
