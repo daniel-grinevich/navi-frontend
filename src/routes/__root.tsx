@@ -13,8 +13,12 @@ import { seo } from '~/utils/seo'
 import type { QueryClient } from '@tanstack/react-query'
 import { CartContextProvider } from '~/context/CartContext'
 import { AuthContextProvider } from '~/context/AuthContext'
+import { QueryErrorResetBoundary } from '@tanstack/react-query'
 import { Coffee } from 'lucide-react'
 import appCss from '~/styles/app.css?url'
+import { ErrorBoundary } from 'react-error-boundary'
+import LoadingSpinner from '~/components/skeletons/LoadingSpinner'
+import { QueryFallback } from '~/components/QueryFallback'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -72,9 +76,17 @@ function RootComponent() {
   return (
     <AuthContextProvider>
       <CartContextProvider>
-        <RootDocument>
-          <Outlet />
-        </RootDocument>
+        <QueryErrorResetBoundary>
+          {({ reset }) => (
+            <ErrorBoundary onReset={reset} FallbackComponent={QueryFallback}>
+              <React.Suspense fallback={<LoadingSpinner />}>
+                <RootDocument>
+                  <Outlet />
+                </RootDocument>
+              </React.Suspense>
+            </ErrorBoundary>
+          )}
+        </QueryErrorResetBoundary>
       </CartContextProvider>
     </AuthContextProvider>
   )

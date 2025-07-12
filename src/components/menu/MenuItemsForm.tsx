@@ -1,6 +1,7 @@
 // src/components/menu/MenuItemsForm.tsx
 import { useQuery } from '@tanstack/react-query'
 import { fetchFakeMenuItems } from '~/utils/deprecated_menuitem_example'
+import { MenuItemType } from '~/utils/menu/fetchMenuItems'
 import React from 'react'
 
 export default function MenuItemsForm() {
@@ -31,7 +32,7 @@ export default function MenuItemsForm() {
       className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md space-y-6"
     >
       <ul className="space-y-4">
-        {menuItems.map((item) => (
+        {menuItems.map((item: MenuItemType) => (
           <li key={item.slug} className="flex items-center justify-between">
             <label className="flex items-center space-x-2">
               <input

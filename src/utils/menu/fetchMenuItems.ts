@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { API_URL } from '~/constants/api'
 
 export interface MenuItemType {
   category_name: string
@@ -18,7 +19,6 @@ export interface MenuItemType {
 
 export const fetchMenuItems = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const API_URL = import.meta.env.VITE_NAVI_API_URL!
     const menuItemsUrl = `${API_URL}/api/menu_items/`
 
     const response = await fetch(menuItemsUrl, {

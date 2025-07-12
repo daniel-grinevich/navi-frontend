@@ -1,13 +1,9 @@
 import React from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import { useQuery } from '@tanstack/react-query'
 import { OrderItemType } from '~/context/CartContext'
 import { useCart } from '~/hooks/useCart'
 import CustomizationGroup from '~/components/CustomizationGroup'
-import { ONE_DAY_MS, ONE_HOUR_MS } from '~/constants/api'
-
-const API_URL = import.meta.env.VITE_NAVI_API_URL!
+import useMenuCustomizations from '~/hooks/useMenuCustomizations'
 
 export interface OrderCustomizationType {
   customization: string
@@ -43,25 +39,6 @@ export interface CustomizationGroupType {
   customizations: CustomizationType[]
 }
 
-interface Category {
-  id: number
-  name: string
-  slug: string
-  customization_groups: CustomizationGroupType[]
-}
-
-interface MenuCustomizationsPayload {
-  name: string
-  slug: string
-  status: string
-  image: string
-  body: string
-  description: string
-  price: number
-  ingredients: any[]
-  category: Category
-}
-
 export interface SelectedCustomizationType {
   group: string
   customization: string
@@ -77,34 +54,11 @@ export const Route = createFileRoute('/menu/$slug')({
   },
 })
 
-const fetchMenuItem = createServerFn({ method: 'GET' })
-  .validator((data: string) => data)
-  .handler(async (ctx) => {
-    const menuItemsUrl = `${API_URL}/api/menu_items/${ctx.data}/category-customizations/`
-
-    const res = await fetch(menuItemsUrl, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    })
-
-    if (!res.ok) throw new Error('Error fetching menu item')
-
-    const data = await res.json()
-    console.log(data)
-
-    return data as MenuCustomizationsPayload
-  })
-
 function MenuItemDetail() {
   const navigate = useNavigate()
   const { slug } = Route.useParams()
   const { orderItemId }: { orderItemId?: string } = Route.useSearch()
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['menuDetail', slug],
-    queryFn: () => fetchMenuItem({ data: slug }),
-    staleTime: ONE_DAY_MS,
-    gcTime: ONE_HOUR_MS,
-  })
+  const { data } = useMenuCustomizations(slug)
   const [cart, cartDispatch] = useCart()
   const [selectedCustomizations, setSelectedCustomizations] = React.useState<
     SelectedCustomizationType[] | []
@@ -130,12 +84,9 @@ function MenuItemDetail() {
         customization: customization.name,
       }
     })
-    console.log(updatedSelections)
 
     setSelectedCustomizations(updatedSelections)
   }, [orderItemId, cart, data])
-
-  if (isError) return <div>Error: {String(error)}</div>
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -227,9 +178,6 @@ function MenuItemDetail() {
     })
   }
 
-  if (isLoading) return <div>Is Loading...</div>
-  if (isError) return <div>Error...</div>
-
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <form
@@ -245,7 +193,7 @@ function MenuItemDetail() {
             <section key={group.slug} className="p-4 rounded-lg border">
               <h3 className="text-lg font-semibold mb-2">{group.name}</h3>
               <CustomizationGroup
-                customizationGroup={isLoading ? null : group}
+                customizationGroup={group}
                 onSelect={(selected) => handleSelect(group.slug, selected)}
                 selectedCustomizations={selectedCustomizations
                   .filter((c) => c.group === group.slug)
