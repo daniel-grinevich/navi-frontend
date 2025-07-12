@@ -43,8 +43,6 @@ function MenuPage() {
     return menuItems.filter((item) => item?.category_name != activeCategory)
   }, [menuItems, activeCategory])
 
-  if (isLoading) return <div>Loading…</div>
-  if (isError) return <div>Error loading menu</div>
   return (
     <div className="relative p-3 flex flex-col md:flex-col lg:flex-row gap-6">
       <aside className="lg:w-1/6 lg:sticky lg:top-0">
