@@ -4,12 +4,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import CompletePage from '~/components/cart/CompletePage'
 import { STRIPE_API_P_KEY } from '~/constants/api'
 import { useCheckout } from '~/hooks/useCheckout'
+import type { Appearance } from '@stripe/stripe-js'
 
 const stripePromise = loadStripe(STRIPE_API_P_KEY)
 
-const appearance = {
-  theme: 'night',
-}
+const appearance: Appearance = { theme: 'night' }
 
 const loader = 'auto'
 

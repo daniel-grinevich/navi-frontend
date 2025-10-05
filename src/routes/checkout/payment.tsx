@@ -5,9 +5,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import PaymentForm from '~/components/cart/PaymentForm'
 import { STRIPE_API_P_KEY } from '~/constants/api'
 import { useCheckout } from '~/hooks/useCheckout'
+import { Appearance } from '@stripe/stripe-js'
 
 const stripePromise = loadStripe(STRIPE_API_P_KEY)
-const appearance = {
+const appearance: Appearance = {
   theme: 'night',
 }
 

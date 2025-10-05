@@ -11,7 +11,7 @@ export const Route = createFileRoute('/menu/')({
 function MenuPage() {
   const [activeCategory, setActiveCategory] = React.useState('')
   const navigate = useNavigate()
-  const { data: menuItems = [], isLoading, isError } = useMenu()
+  const { data: menuItems = [] } = useMenu()
 
   const categories = React.useMemo(
     () =>

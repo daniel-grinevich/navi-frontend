@@ -1,7 +1,9 @@
 {
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "src",
+    "types"
   ],
   "compilerOptions": {
     "strict": true,

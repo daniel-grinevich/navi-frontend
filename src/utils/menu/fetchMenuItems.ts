@@ -26,9 +26,11 @@ export const fetchMenuItems = createServerFn({ method: 'GET' }).handler(
       headers: { 'Content-Type': 'application/json' },
     })
 
+
     if (!response.ok)
       throw new Error(`Error fetching menu items: ${response.status}`)
 
-    return (await response.json()) as [MenuItemType]
+    const data = await response.json()
+    return data as [MenuItemType]
   }
 )

@@ -6,7 +6,7 @@ export default function useMenuCustomizations(slug: string) {
   return useSuspenseQuery({
     queryKey: ['menuDetail', slug],
     queryFn: () => fetchMenuItem({ data: slug }),
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: ONE_DAY_MS,
+    gcTime: ONE_HOUR_MS,
   })
 }

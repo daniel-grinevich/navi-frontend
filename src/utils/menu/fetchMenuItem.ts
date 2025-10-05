@@ -27,15 +27,14 @@ export const fetchMenuItem = createServerFn({ method: 'GET' })
   .handler(async (ctx) => {
     const menuItemsUrl = `${API_URL}/api/menu_items/${ctx.data}/category-customizations/`
 
-    const res = await fetch(menuItemsUrl, {
+    const response = await fetch(menuItemsUrl, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     })
 
-    if (!res.ok) throw new Error('Error fetching menu item')
+    if (!response.ok) throw new Error('Error fetching menu item')
 
-    const data = await res.json()
-    console.log(data)
+    const data = await response.json()
 
     return data as MenuCustomizationsPayload
   })
