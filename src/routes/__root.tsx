@@ -78,13 +78,13 @@ function RootComponent() {
       <CartContextProvider>
         <QueryErrorResetBoundary>
           {({ reset }) => (
-            <ErrorBoundary onReset={reset} FallbackComponent={QueryFallback}>
-              <React.Suspense fallback={<LoadingSpinner />}>
-                <RootDocument>
+            <RootDocument>
+              <ErrorBoundary onReset={reset} FallbackComponent={QueryFallback}>
+                <React.Suspense fallback={<LoadingSpinner />}>
                   <Outlet />
-                </RootDocument>
-              </React.Suspense>
-            </ErrorBoundary>
+                </React.Suspense>
+              </ErrorBoundary>
+            </RootDocument>
           )}
         </QueryErrorResetBoundary>
       </CartContextProvider>
@@ -100,7 +100,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   // }, [cartState])
 
   return (
-    <html>
+    <html lang="en">
       <head>
         <HeadContent />
       </head>

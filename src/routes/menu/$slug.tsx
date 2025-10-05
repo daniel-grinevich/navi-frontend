@@ -54,15 +54,128 @@ export const Route = createFileRoute('/menu/$slug')({
   },
 })
 
+//Maps old customizations to UI if editing an existing order item
+function mapOrderItemToSelections(
+  orderItem: OrderItemType,
+  groups: CustomizationGroupType[]
+): SelectedCustomizationType[] {
+  return orderItem.customizations.map(({ name }) => {
+    const matchedGroup = groups.find((group) =>
+      group.customizations.some((c) => c.name === name)
+    )
+    return { group: matchedGroup?.slug ?? '', customization: name }
+  })
+}
+
+function toggleCustomization(
+  prev: SelectedCustomizationType[],
+  group: CustomizationGroupType,
+  customization: string
+): SelectedCustomizationType[] {
+  const { slug, allow_multiple } = group
+  const alreadySelected = prev.some(
+    (c) => c.group === slug && c.customization === customization
+  )
+
+  if (alreadySelected) {
+    // Deselect
+    return prev.filter(
+      (c) => !(c.group === slug && c.customization === customization)
+    )
+  }
+
+  if (!allow_multiple) {
+    // Replace group
+    return [
+      ...prev.filter((c) => c.group !== slug),
+      { group: slug, customization },
+    ]
+  }
+
+  // Add new selection
+  return [...prev, { group: slug, customization }]
+}
+
 function MenuItemDetail() {
   const navigate = useNavigate()
   const { slug } = Route.useParams()
   const { orderItemId }: { orderItemId?: string } = Route.useSearch()
   const { data } = useMenuCustomizations(slug)
+  const customizationGroups = React.useMemo(
+    () => data?.category.customization_groups ?? [],
+    [data]
+  )
   const [cart, cartDispatch] = useCart()
   const [selectedCustomizations, setSelectedCustomizations] = React.useState<
-    SelectedCustomizationType[] | []
+    SelectedCustomizationType[]
   >([])
+
+  const createOrderItem = () => {
+    const newItem: OrderItemType = {
+      id: crypto.randomUUID(),
+      menuItem: {
+        name: data.name,
+        slug: data.slug,
+        status: data.status,
+        description: data.description,
+        image: data.image,
+        body: data.body,
+        price: data.price,
+        ingredients: data.ingredients,
+        category_name: '',
+        created_at: null,
+        updated_at: null,
+        created_by: null,
+        updated_by: null,
+      },
+      quantity: 1,
+      customizations: selectedCustomizations.map((selectedCustomization) => {
+        return { name: selectedCustomization.customization, quantity: 1 }
+      }),
+    }
+    cartDispatch({ type: 'ADD_ITEM', payload: { item: newItem } })
+    navigate({ to: '/menu' })
+  }
+
+  const updateOrderItem = (orderItemId: string) => {
+    const customizations = selectedCustomizations.map(
+      (selectedCustomization) => {
+        return {
+          name: selectedCustomization.customization,
+          quantity: 1,
+        }
+      }
+    )
+    cartDispatch({
+      type: 'UPDATE',
+      payload: {
+        id: orderItemId,
+        updatedItem: {
+          customizations: customizations,
+        },
+      },
+    })
+    navigate({ to: '/checkout/cart' })
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (orderItemId) {
+      updateOrderItem(orderItemId)
+    } else {
+      createOrderItem()
+    }
+  }
+
+  const handleSelect = (
+    group: CustomizationGroupType,
+    customization: string
+  ) => {
+    setSelectedCustomizations((prev) =>
+      toggleCustomization(prev, group, customization)
+    )
+  }
 
   React.useEffect(() => {
     if (!orderItemId || !data) return
@@ -71,112 +184,10 @@ function MenuItemDetail() {
     )
     if (!orderItem) return
 
-    const updatedSelections = orderItem.customizations.map((customization) => {
-      const matchedGroup = data.category.customization_groups.find((group) =>
-        group.customizations.some(
-          (customizationInGroup) =>
-            customization.name === customizationInGroup.name
-        )
-      )
-
-      return {
-        group: matchedGroup?.slug ?? '',
-        customization: customization.name,
-      }
-    })
-
-    setSelectedCustomizations(updatedSelections)
-  }, [orderItemId, cart, data])
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (data === undefined) {
-      return null
-    }
-
-    if (orderItemId) {
-      const customizations = selectedCustomizations.map(
-        (selectedCustomization) => {
-          return {
-            name: selectedCustomization.customization,
-            quantity: 1,
-          }
-        }
-      )
-      cartDispatch({
-        type: 'UPDATE',
-        payload: {
-          id: orderItemId,
-          updatedItem: {
-            customizations: customizations,
-          },
-        },
-      })
-      navigate({ to: '/checkout/cart' })
-    } else {
-      const newItem: OrderItemType = {
-        id: crypto.randomUUID(),
-        menuItem: {
-          name: data.name,
-          slug: data.slug,
-          status: data.status,
-          description: data.description,
-          image: data.image,
-          body: data.body,
-          price: data.price,
-          ingredients: data.ingredients,
-          category_name: '',
-          created_at: null,
-          updated_at: null,
-          created_by: null,
-          updated_by: null,
-        },
-        quantity: 1,
-        customizations: selectedCustomizations.map((selectedCustomization) => {
-          return { name: selectedCustomization.customization, quantity: 1 }
-        }),
-      }
-      cartDispatch({ type: 'ADD_ITEM', payload: { item: newItem } })
-      navigate({ to: '/menu' })
-    }
-  }
-
-  const handleSelect = (groupSlug: string, customization: string) => {
-    if (
-      groupSlug == undefined ||
-      customization == undefined ||
-      data == undefined
-    ) {
-      return null
-    }
-    const group = data.category.customization_groups.find(
-      (g) => g.slug === groupSlug
+    setSelectedCustomizations(
+      mapOrderItemToSelections(orderItem, customizationGroups)
     )
-
-    if (!group) return
-    const isMulti = group.allow_multiple
-
-    setSelectedCustomizations((prev) => {
-      const alreadySelected = prev.some(
-        (c) => c.group === groupSlug && c.customization === customization
-      )
-
-      if (alreadySelected) {
-        return prev.filter(
-          (c) => !(c.group === groupSlug && c.customization === customization)
-        )
-      }
-
-      if (!isMulti) {
-        return [
-          ...prev.filter((c) => c.group !== groupSlug),
-          { group: groupSlug, customization },
-        ]
-      }
-
-      return [...prev, { group: groupSlug, customization }]
-    })
-  }
+  }, [orderItemId, cart, data])
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
@@ -189,12 +200,12 @@ function MenuItemDetail() {
         </h2>
 
         <div className="space-y-4">
-          {data?.category.customization_groups.map((group) => (
+          {customizationGroups.map((group) => (
             <section key={group.slug} className="p-4 rounded-lg border">
               <h3 className="text-lg font-semibold mb-2">{group.name}</h3>
               <CustomizationGroup
                 customizationGroup={group}
-                onSelect={(selected) => handleSelect(group.slug, selected)}
+                onSelect={(selected) => handleSelect(group, selected)}
                 selectedCustomizations={selectedCustomizations
                   .filter((c) => c.group === group.slug)
                   .map((c) => c.customization)}
@@ -216,7 +227,7 @@ function MenuItemDetail() {
             type="submit"
             className="px-6 py-3 rounded-lg font-semibold bg-green-500"
           >
-            Add to Cart
+            {orderItemId ? 'Update Item' : 'Add to Cart'}
           </button>
         </div>
       </form>
