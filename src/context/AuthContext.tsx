@@ -5,10 +5,19 @@ const API_URL = import.meta.env.VITE_NAVI_API_URL
 const USERNAME = import.meta.env.VITE_NAVI_USERNAME
 const PASSWORD = import.meta.env.VITE_NAVI_PASSWORD
 
-export const authContext = React.createContext({
+type LoginResult = { success: boolean; message?: string }
+
+type AuthContextType = {
+  authToken: string
+  isAuthenticated: boolean
+  login: (username: string, password: string) => Promise<LoginResult>
+  logout: () => void
+}
+
+export const authContext = React.createContext<AuthContextType>({
   authToken: '',
   isAuthenticated: false,
-  login: (username: string, password: string) => {},
+  login: async () => ({ success: false }),
   logout: () => {},
 })
 
@@ -22,7 +31,7 @@ export function AuthContextProvider({
 
   const login = async (username: string, password: string) => {
     if (!username || !password) {
-      throw new Error('Error in login params')
+      return { success: false, message: 'Invalid credentials' }
     }
     try {
       const response = await fetch(`${API_URL}/api/login/`, {
@@ -31,7 +40,8 @@ export function AuthContextProvider({
         body: JSON.stringify({ username, password }),
       })
       if (!response.ok) {
-        throw new Error('Error fetching user token')
+        const err = await response.text()
+        return { success: false, message: err || 'Invalid credentials' }
       }
       const { token } = await response.json()
 
@@ -39,8 +49,10 @@ export function AuthContextProvider({
 
       setAuthToken(token)
       setIsAuthenticated(true)
+      return { success: true }
     } catch (error) {
-      throw new Error('Error fetching user token')
+      console.error('Login failed:', error)
+      return { success: false, message: 'Network or server error' }
     }
   }
 

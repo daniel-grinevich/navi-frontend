@@ -13,6 +13,7 @@ import { Route as CheckoutRouteRouteImport } from './routes/checkout/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrdersIndexRouteImport } from './routes/orders/index'
 import { Route as MenuIndexRouteImport } from './routes/menu/index'
+import { Route as UsersLoginRouteImport } from './routes/users/login'
 import { Route as MenuSlugRouteImport } from './routes/menu/$slug'
 import { Route as CheckoutPaymentRouteImport } from './routes/checkout/payment'
 import { Route as CheckoutCompleteRouteImport } from './routes/checkout/complete'
@@ -36,6 +37,11 @@ const OrdersIndexRoute = OrdersIndexRouteImport.update({
 const MenuIndexRoute = MenuIndexRouteImport.update({
   id: '/menu/',
   path: '/menu/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsersLoginRoute = UsersLoginRouteImport.update({
+  id: '/users/login',
+  path: '/users/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MenuSlugRoute = MenuSlugRouteImport.update({
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/checkout/complete': typeof CheckoutCompleteRoute
   '/checkout/payment': typeof CheckoutPaymentRoute
   '/menu/$slug': typeof MenuSlugRoute
+  '/users/login': typeof UsersLoginRoute
   '/menu': typeof MenuIndexRoute
   '/orders': typeof OrdersIndexRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/checkout/complete': typeof CheckoutCompleteRoute
   '/checkout/payment': typeof CheckoutPaymentRoute
   '/menu/$slug': typeof MenuSlugRoute
+  '/users/login': typeof UsersLoginRoute
   '/menu': typeof MenuIndexRoute
   '/orders': typeof OrdersIndexRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/checkout/complete': typeof CheckoutCompleteRoute
   '/checkout/payment': typeof CheckoutPaymentRoute
   '/menu/$slug': typeof MenuSlugRoute
+  '/users/login': typeof UsersLoginRoute
   '/menu/': typeof MenuIndexRoute
   '/orders/': typeof OrdersIndexRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/checkout/complete'
     | '/checkout/payment'
     | '/menu/$slug'
+    | '/users/login'
     | '/menu'
     | '/orders'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/checkout/complete'
     | '/checkout/payment'
     | '/menu/$slug'
+    | '/users/login'
     | '/menu'
     | '/orders'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/checkout/complete'
     | '/checkout/payment'
     | '/menu/$slug'
+    | '/users/login'
     | '/menu/'
     | '/orders/'
   fileRoutesById: FileRoutesById
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CheckoutRouteRoute: typeof CheckoutRouteRouteWithChildren
   MenuSlugRoute: typeof MenuSlugRoute
+  UsersLoginRoute: typeof UsersLoginRoute
   MenuIndexRoute: typeof MenuIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
 }
@@ -159,6 +172,13 @@ declare module '@tanstack/react-router' {
       path: '/menu'
       fullPath: '/menu'
       preLoaderRoute: typeof MenuIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/users/login': {
+      id: '/users/login'
+      path: '/users/login'
+      fullPath: '/users/login'
+      preLoaderRoute: typeof UsersLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/menu/$slug': {
@@ -212,6 +232,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CheckoutRouteRoute: CheckoutRouteRouteWithChildren,
   MenuSlugRoute: MenuSlugRoute,
+  UsersLoginRoute: UsersLoginRoute,
   MenuIndexRoute: MenuIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
 }

@@ -35,7 +35,7 @@ function MenuPage() {
     navigate({
       to: '/menu/$slug',
       params: { slug: menuSlug },
-      search: { orderItemId: undefined },
+      search: { orderItemId: undefined }, //orderItemId is used to populate customizations when returning from the cart
     })
   }
 
