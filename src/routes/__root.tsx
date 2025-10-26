@@ -19,6 +19,7 @@ import appCss from '~/styles/app.css?url'
 import { ErrorBoundary } from 'react-error-boundary'
 import LoadingSpinner from '~/components/skeletons/LoadingSpinner'
 import { QueryFallback } from '~/components/QueryFallback'
+import { useAuth } from '~/hooks/useAuth'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -99,64 +100,76 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   //   return cartState.reduce((sum, item) => sum + item.quantity, 0)
   // }, [cartState])
 
+  const { isAuthenticated, logout } = useAuth()
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body>
-        <div className="flex justify-center items-center">
-          <nav>
-            <ul className="flex flex-row gap-3 items-center w-full">
-              <li className="p-3 text-lg">
-                <Link
-                  to="/"
-                  activeProps={{
-                    className: 'font-bold',
-                  }}
-                  activeOptions={{ exact: true }}
-                >
-                  Home
-                </Link>
-              </li>
-              <li className="p-3 text-lg">
-                <Link
-                  to="/menu"
-                  activeProps={{
-                    className: 'font-bold',
-                  }}
-                  activeOptions={{ exact: true }}
-                >
-                  Menu
-                </Link>
-              </li>
-              <li className="p-3 text-lg">
-                <Link
-                  to="/orders"
-                  activeProps={{
-                    className: 'font-bold',
-                  }}
-                  activeOptions={{ exact: true }}
-                >
-                  Orders
-                </Link>
-              </li>
-              <li className="relative text-lg">
-                <Link
-                  to="/checkout/cart"
-                  activeProps={{ className: 'font-bold' }}
-                >
-                  <Coffee />
-                </Link>
-                {/* {totalCartItems > 0 && (
+        <nav>
+          <ul className="flex items-center w-full">
+            <li className="p-3 text-lg">
+              <Link
+                to="/"
+                activeProps={{
+                  className: 'font-bold',
+                }}
+                activeOptions={{ exact: true }}
+              >
+                Home
+              </Link>
+            </li>
+            <li className="p-3 text-lg">
+              <Link
+                to="/menu"
+                activeProps={{
+                  className: 'font-bold',
+                }}
+                activeOptions={{ exact: true }}
+              >
+                Menu
+              </Link>
+            </li>
+            <li className="p-3 text-lg">
+              <Link
+                to="/orders"
+                activeProps={{
+                  className: 'font-bold',
+                }}
+                activeOptions={{ exact: true }}
+              >
+                Orders
+              </Link>
+            </li>
+            <li className="relative text-lg">
+              <Link
+                to="/checkout/cart"
+                activeProps={{ className: 'font-bold' }}
+              >
+                <Coffee />
+              </Link>
+              {/* {totalCartItems > 0 && (
                   <span className="absolute -top-2 -right-6 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
                     {totalCartItems}
                   </span>
                 )} */}
-              </li>
-            </ul>
-          </nav>
-        </div>
+            </li>
+            <li className="text-lg ml-auto">
+              {isAuthenticated ? (
+                <button onClick={logout}>Logout</button>
+              ) : (
+                <Link
+                  to="/users/login"
+                  activeProps={{ className: 'font-bold' }}
+                >
+                  Login
+                </Link>
+              )}
+            </li>
+          </ul>
+        </nav>
         <hr />
         {children}
         <TanStackRouterDevtools position="bottom-right" />

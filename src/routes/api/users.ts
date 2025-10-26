@@ -1,9 +1,11 @@
 import { json } from '@tanstack/react-start'
 import { createAPIFileRoute } from '@tanstack/react-start/api'
-import type { User } from '../../utils/users'
+import type {User} from '~/utils/auth/performLogin'
+
+
 
 export const APIRoute = createAPIFileRoute('/api/users')({
-  GET: async ({ request }) => {
+  GET: async ({ request }: {request:Request}) => {
     console.info('Fetching users... @', request.url)
     const res = await fetch('https://jsonplaceholder.typicode.com/users')
     if (!res.ok) {
